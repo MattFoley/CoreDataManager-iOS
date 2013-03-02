@@ -57,7 +57,7 @@
 
     NSDictionary *dict = @{PARAM_FIRST_NAME : @"firstName",
                            PARAM_LAST_NAME : @"lastName"};
-    VIManagedObjectMap *personMap = [VIManagedObjectMap mapWithUniqueKey:@"lastName" mappingDictionary:dict];
+    VIManagedObjectMapper *personMap = [VIManagedObjectMapper mapWithUniqueKey:@"lastName" mappingDictionary:dict];
     [[VICoreDataManager getInstance] setObjectMap:personMap forClass:[VIPerson class]];
     
     NSArray *array = [NSArray arrayWithObjects:

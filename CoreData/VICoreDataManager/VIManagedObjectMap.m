@@ -4,39 +4,52 @@
 //
 
 #import "VIManagedObjectMap.h"
-#import "VICoreDataManager.h"
-
-@interface VIManagedObjectMap() {
-    NSString *_comparisonKey;
-    NSDictionary *_mappingDictionary;
-}
-@end
 
 @implementation VIManagedObjectMap
 
-+ (instancetype)mapWithUniqueKey:(NSString *)comparisonKey mappingDictionary:(NSDictionary *)mappingDict
++ (instancetype)mapWithInput:(NSString *)inputKey output:(NSString *)outputKey
 {
-    VIManagedObjectMap *map = [[self alloc] init];
-    [map setUniqueComparisonKey:comparisonKey];
-    [map setMappingDictionary:mappingDict];
-    [map setDeleteRule:VIManagedObjectMapOverwrite];
-    return map;
+    return [self mapWithInput:inputKey output:outputKey expectedClass:[NSString class]];
 }
 
-@end
-
-@implementation VIManagedObjectMap (setInformationFromDictionary)
-- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object
++ (instancetype)mapWithInput:(NSString *)inputKey
+                      output:(NSString *)outputKey
+               expectedClass:(Class)expectedClass
 {
-    [inputDict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        id translatedKey = [self.mappingDictionary valueForKey:key];
+    return [self mapWithInput:inputKey output:outputKey expectedClass:[NSString class] dateFormatter:nil];
+}
 
-        //todo - put checks for NSNumber and NSDate with dateformatter
-        if (![obj isEqual:[NSNull null]]) {
-            [object setValue:obj forKey:translatedKey];
-        }
++ (instancetype)mapWithInput:(NSString *)inputKey
+                      output:(NSString *)outputKey
+               expectedClass:(Class)expectedClass
+               dateFormatter:(NSDateFormatter *)dateFormatter
+{
+    VIManagedObjectMap *map = [[self alloc] init];
+    [map setInputKey:inputKey];
+    
+    
+}
 
-    }];
+//default date handling
++ (NSDate *)dateFromInternetDate:(NSString *)dateString
+{
+    static NSDateFormatter *df;
+
+    if (!df) {
+        df = [[NSDateFormatter alloc] init];
+        [df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+        [df setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    }
+    return df;
+}
+
+- (void)dateFormatter
+{
+    if (_dateFormatter) {
+        return _dateFormatter;
+    }
+
+    return [[self class] dateFromInternetDate];
 }
 
 @end

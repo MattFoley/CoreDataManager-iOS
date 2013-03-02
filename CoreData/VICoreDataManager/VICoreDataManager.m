@@ -48,14 +48,14 @@ NSString *const iCloudLogsDirectoryName = @"Logs";
 - (void)mergeChangesFromiCloud:(NSNotification *)notification;
 
 //Convenience Methods
-- (VIManagedObjectMap *)mapForClass:(Class)objectClass;
+- (VIManagedObjectMapper *)mapForClass:(Class)objectClass;
 - (NSURL *)applicationDocumentsDirectory;
 - (void)debugPersistentStore;
 
 @end
 
 //private interface to VIManagedObjectMap
-@interface VIManagedObjectMap (setInformationFromDictionary)
+@interface VIManagedObjectMapper (setInformationFromDictionary)
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object;
 @end
 
@@ -223,7 +223,7 @@ static VICoreDataManager *_sharedObject = nil;
     return [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(managedObjectClass) inManagedObjectContext:contextOrNil];
 }
 
-- (BOOL)setObjectMap:(VIManagedObjectMap *)objMap forClass:(Class)objectClass
+- (BOOL)setObjectMapper:(VIManagedObjectMapper *)objMap forClass:(Class)objectClass
 {
     if (objMap && objectClass) {
         [self.mapCollection setObject:objMap forKey:NSStringFromClass(objectClass)];
@@ -235,8 +235,8 @@ static VICoreDataManager *_sharedObject = nil;
 
 - (void)importArray:(NSArray *)inputArray forClass:(Class)objectClass withContext:(NSManagedObjectContext*)contextOrNil
 {
-    VIManagedObjectMap *mapper = [self mapForClass:objectClass];
-    if (mapper.deleteRule == VIManagedObjectMapDeleteAll) {
+    VIManagedObjectMapper *mapper = [self mapForClass:objectClass];
+    if (mapper.deleteRule == VIManagedObjectMapperDeleteAll) {
         [self deleteAllObjectsOfClass:objectClass context:contextOrNil];
     }
 
@@ -253,7 +253,7 @@ static VICoreDataManager *_sharedObject = nil;
 {
     contextOrNil = [self threadSafeContext:contextOrNil];
     
-    VIManagedObjectMap *mapper = [self mapForClass:objectClass];
+    VIManagedObjectMapper *mapper = [self mapForClass:objectClass];
     NSString *uniqueKey = [mapper uniqueComparisonKey];
 
     id inputValue = [inputDict objectForKey:uniqueKey];
@@ -266,7 +266,7 @@ static VICoreDataManager *_sharedObject = nil;
     if ([existingArray count]) {
         NSManagedObject *existingObject = existingArray[0];
         [self setInformationFromDictionary:inputDict forManagedObject:existingObject];
-    } else if (mapper.deleteRule == VIManagedObjectMapOverwrite) {
+    } else if (mapper.deleteRule == VIManagedObjectMapperOverwrite) {
         NSManagedObject *aNewObject = [self addObjectForClass:objectClass forContext:contextOrNil];
         [self setInformationFromDictionary:inputDict forManagedObject:aNewObject];
     }
@@ -274,7 +274,7 @@ static VICoreDataManager *_sharedObject = nil;
 
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object
 {
-    VIManagedObjectMap *mapper = [self mapForClass:[object class]];
+    VIManagedObjectMapper *mapper = [self mapForClass:[object class]];
     [mapper setInformationFromDictionary:inputDict forManagedObject:object];
 }
 
@@ -487,7 +487,7 @@ static VICoreDataManager *_sharedObject = nil;
 }
 
 #pragma mark - Convenience Methods
-- (VIManagedObjectMap *)mapForClass:(Class)objectClass
+- (VIManagedObjectMapper *)mapForClass:(Class)objectClass
 {
     return [self.mapCollection objectForKey:NSStringFromClass(objectClass)];
 }
