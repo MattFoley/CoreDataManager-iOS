@@ -54,8 +54,12 @@
 - (void)initializeCoreData
 {
     [self resetCoreData];
+
+    NSDictionary *dict = @{PARAM_FIRST_NAME : @"firstName",
+                           PARAM_LAST_NAME : @"lastName"};
+    VIManagedObjectMap *personMap = [VIManagedObjectMap mapWithUniqueKey:@"lastName" mappingDictionary:dict];
+    [[VICoreDataManager getInstance] setObjectMap:personMap forClass:[VIPerson class]];
     
-    NSManagedObjectContext *context = [[VICoreDataManager getInstance] managedObjectContext];
     NSArray *array = [NSArray arrayWithObjects:
             [NSDictionary dictionaryWithObjectsAndKeys:@"Anthony", PARAM_FIRST_NAME, @"Alesia", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Reid", PARAM_FIRST_NAME, @"Lappin", PARAM_LAST_NAME, nil],
@@ -76,7 +80,7 @@
             [NSDictionary dictionaryWithObjectsAndKeys:@"Austin", PARAM_FIRST_NAME, @"Sheaffer", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Jamie", PARAM_FIRST_NAME, @"Calder", PARAM_LAST_NAME, nil], nil];
 
-    [VIPerson addWithArray:array forManagedObjectContext:context];
+    [VIPerson addWithArray:array forManagedObjectContext:nil];
 }
 
 - (void)resetCoreData

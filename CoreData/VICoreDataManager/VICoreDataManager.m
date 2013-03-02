@@ -20,6 +20,7 @@ NSString *const iCloudLogsDirectoryName = @"Logs";
 @property NSString *databaseFilename;
 @property NSString *iCloudAppId;
 @property NSString *bundleIdentifier;
+@property NSMutableDictionary *mapCollection;
 
 - (NSBundle *)bundle;
 
@@ -47,9 +48,15 @@ NSString *const iCloudLogsDirectoryName = @"Logs";
 - (void)mergeChangesFromiCloud:(NSNotification *)notification;
 
 //Convenience Methods
+- (VIManagedObjectMap *)mapForClass:(Class)objectClass;
 - (NSURL *)applicationDocumentsDirectory;
 - (void)debugPersistentStore;
 
+@end
+
+//private interface to VIManagedObjectMap
+@interface VIManagedObjectMap (setInformationFromDictionary)
+- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object;
 @end
 
 static VICoreDataManager *_sharedObject = nil;
@@ -70,6 +77,15 @@ static VICoreDataManager *_sharedObject = nil;
     });
 
     return _sharedObject;
+}
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        _mapCollection = [NSMutableDictionary dictionary];
+    }
+    return self;
 }
 
 - (void)setResource:(NSString *)resource database:(NSString *)database
@@ -102,7 +118,7 @@ static VICoreDataManager *_sharedObject = nil;
     }
 
     NSAssert(bundle, @"Missing bundle. Check the Bundle identifier on the plist of this target vs the identifiers array in this class.");
-           
+
     return bundle;
 }
 
@@ -201,29 +217,85 @@ static VICoreDataManager *_sharedObject = nil;
     }
 }
 
-#pragma mark - CDMethods
-- (NSManagedObject *)addObjectForEntityName:(NSString *)entityName forContext:(NSManagedObjectContext *)contextOrNil
+#pragma mark - Create and configure
+- (NSManagedObject *)addObjectForClass:(Class)managedObjectClass forContext:(NSManagedObjectContext *)contextOrNil
 {
-    return [NSEntityDescription insertNewObjectForEntityForName:entityName inManagedObjectContext:contextOrNil];
+    return [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(managedObjectClass) inManagedObjectContext:contextOrNil];
 }
 
-- (NSArray *)arrayForEntityName:(NSString *)entityName
+- (BOOL)setObjectMap:(VIManagedObjectMap *)objMap forClass:(Class)objectClass
 {
-    return [self arrayForEntityName:entityName forContext:nil];
-}
-
-- (NSArray *)arrayForEntityName:(NSString *)entityName forContext:(NSManagedObjectContext *)contextOrNil
-{
-    return [self arrayForEntityName:entityName withPredicate:nil forContext:contextOrNil];
-}
-
-- (NSArray *)arrayForEntityName:(NSString *)entityName withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)contextOrNil
-{
-    if (!entityName) {
-        return nil;
+    if (objMap && objectClass) {
+        [self.mapCollection setObject:objMap forKey:NSStringFromClass(objectClass)];
+        return YES;
     }
 
+    return NO;
+}
+
+- (void)importArray:(NSArray *)inputArray forClass:(Class)objectClass withContext:(NSManagedObjectContext*)contextOrNil
+{
+    VIManagedObjectMap *mapper = [self mapForClass:objectClass];
+    if (mapper.deleteRule == VIManagedObjectMapDeleteAll) {
+        [self deleteAllObjectsOfClass:objectClass context:contextOrNil];
+    }
+
+    [inputArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[NSDictionary class]]) {
+            [self importDictionary:obj forClass:objectClass withContext:contextOrNil];
+        } else {
+            NSLog(@"%s \nexpecting an NSArray full of NSDictionaries", __PRETTY_FUNCTION__);
+        }
+    }];
+}
+
+- (void)importDictionary:(NSDictionary *)inputDict forClass:(Class)objectClass withContext:(NSManagedObjectContext *)contextOrNil
+{
     contextOrNil = [self threadSafeContext:contextOrNil];
+    
+    VIManagedObjectMap *mapper = [self mapForClass:objectClass];
+    NSString *uniqueKey = [mapper uniqueComparisonKey];
+
+    id inputValue = [inputDict objectForKey:uniqueKey];
+
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ == %@",uniqueKey,inputValue];
+
+    NSArray *existingArray = [self arrayForClass:objectClass withPredicate:predicate forContext:contextOrNil];
+    NSAssert([existingArray count] < 2, @"UNIQUE IDENTIFIER IS NOT UNIQUE. MORE THAN ONE MATCHING OBJECT FOUND");
+
+    if ([existingArray count]) {
+        NSManagedObject *existingObject = existingArray[0];
+        [self setInformationFromDictionary:inputDict forManagedObject:existingObject];
+    } else if (mapper.deleteRule == VIManagedObjectMapOverwrite) {
+        NSManagedObject *aNewObject = [self addObjectForClass:objectClass forContext:contextOrNil];
+        [self setInformationFromDictionary:inputDict forManagedObject:aNewObject];
+    }
+}
+
+- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object
+{
+    VIManagedObjectMap *mapper = [self mapForClass:[object class]];
+    [mapper setInformationFromDictionary:inputDict forManagedObject:object];
+}
+
+
+
+#pragma mark -Fetch and delete
+- (NSArray *)arrayForClass:(Class)managedObjectClass
+{
+    return [self arrayForClass:managedObjectClass forContext:nil];
+}
+
+- (NSArray *)arrayForClass:(Class)managedObjectClass forContext:(NSManagedObjectContext *)contextOrNil
+{
+    return [self arrayForClass:managedObjectClass withPredicate:nil forContext:contextOrNil];
+}
+
+- (NSArray *)arrayForClass:(Class)managedObjectClass withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)contextOrNil
+{
+    contextOrNil = [self threadSafeContext:contextOrNil];
+
+    NSString *entityName = NSStringFromClass(managedObjectClass);
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:entityName];
     [fetchRequest setPredicate:predicate];
@@ -242,13 +314,11 @@ static VICoreDataManager *_sharedObject = nil;
     [[object managedObjectContext] deleteObject:object];
 }
 
-- (BOOL)deleteAllObjectsOfEntity:(NSString *)entityName context:(NSManagedObjectContext *)contextOrNil
+- (BOOL)deleteAllObjectsOfClass:(Class)managedObjectClass context:(NSManagedObjectContext *)contextOrNil
 {
-    if (!entityName) {
-        return NO;
-    }
-    
     contextOrNil = [self threadSafeContext:contextOrNil];
+
+    NSString *entityName = NSStringFromClass(managedObjectClass);
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:entityName];
     [fetchRequest setIncludesPropertyValues:NO];
@@ -279,7 +349,7 @@ static VICoreDataManager *_sharedObject = nil;
     }
 #pragma clang diagnostic pop
 #endif
-    
+
     return context;
 }
 
@@ -338,7 +408,7 @@ static VICoreDataManager *_sharedObject = nil;
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSURL *localStore = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:self.databaseFilename];
 
-//http://developer.apple.com/library/ios/#documentation/Cocoa/Reference/Foundation/Classes/NSFileManager_Class/Reference/Reference.html#//apple_ref/occ/instm/NSFileManager/URLForUbiquityContainerIdentifier:
+    //http://developer.apple.com/library/ios/#documentation/Cocoa/Reference/Foundation/Classes/NSFileManager_Class/Reference/Reference.html#//apple_ref/occ/instm/NSFileManager/URLForUbiquityContainerIdentifier:
     NSURL *iCloud = [fileManager URLForUbiquityContainerIdentifier:nil];
 
     if (iCloud) {
@@ -364,8 +434,8 @@ static VICoreDataManager *_sharedObject = nil;
         }
 
         NSString *iCloudData = [[[iCloud path]
-                stringByAppendingPathComponent:iCloudDataDirectoryName]
-                stringByAppendingPathComponent:self.databaseFilename];
+                                 stringByAppendingPathComponent:iCloudDataDirectoryName]
+                                stringByAppendingPathComponent:self.databaseFilename];
 
         NSLog(@"iCloudData = %@", iCloudData);
 
@@ -417,6 +487,11 @@ static VICoreDataManager *_sharedObject = nil;
 }
 
 #pragma mark - Convenience Methods
+- (VIManagedObjectMap *)mapForClass:(Class)objectClass
+{
+    return [self.mapCollection objectForKey:NSStringFromClass(objectClass)];
+}
+
 - (NSURL *)applicationDocumentsDirectory
 {
     return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
@@ -425,7 +500,7 @@ static VICoreDataManager *_sharedObject = nil;
 - (void)resetCoreData
 {
     NSArray *stores = [[self persistentStoreCoordinator] persistentStores];
-    
+
     for(NSPersistentStore *store in stores) {
         [[self persistentStoreCoordinator] removePersistentStore:store error:nil];
         [[NSFileManager defaultManager] removeItemAtPath:store.URL.path error:nil];
@@ -443,31 +518,3 @@ static VICoreDataManager *_sharedObject = nil;
 
 @end
 
-@implementation VICoreDataManager (Deprecated)
-
-- (void)dropTableForEntityWithName:(NSString *)name
-{
-    [self deleteAllObjectsOfEntity:name context:nil];
-}
-
-- (NSArray *)arrayForModel:(NSString *)model
-{
-    return [self arrayForEntityName:model];
-}
-
-- (id)addObjectForModel:(NSString *)model context:(NSManagedObjectContext *)context
-{
-    return [self addObjectForEntityName:model forContext:context];
-}
-
-- (NSArray *)arrayForModel:(NSString *)model forContext:(NSManagedObjectContext *)context
-{
-    return [self arrayForEntityName:model forContext:context];
-}
-
-- (NSArray *)arrayForModel:(NSString *)model withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)context
-{
-    return [self arrayForEntityName:model withPredicate:predicate forContext:context];
-}
-
-@end
