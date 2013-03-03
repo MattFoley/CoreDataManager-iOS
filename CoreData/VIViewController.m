@@ -62,7 +62,7 @@
 ////    [[VICoreDataManager getInstance] setObjectMapper:personMap forClass:[VIPerson class]];
 
     NSArray *array = [NSArray arrayWithObjects:
-            [NSDictionary dictionaryWithObjectsAndKeys:@"Anthony", PARAM_FIRST_NAME, @"Alesia", PARAM_LAST_NAME, nil],
+            [NSDictionary dictionaryWithObjectsAndKeys:@"anthony", PARAM_FIRST_NAME, @"Alesia", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Reid", PARAM_FIRST_NAME, @"Lappin", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Brandon", PARAM_FIRST_NAME, @"Passley", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Andy", PARAM_FIRST_NAME, @"Mack", PARAM_LAST_NAME, nil],
@@ -79,7 +79,7 @@
             [NSDictionary dictionaryWithObjectsAndKeys:@"Brian", PARAM_FIRST_NAME, @"Flavin", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Max", PARAM_FIRST_NAME, @"Bare", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Austin", PARAM_FIRST_NAME, @"Sheaffer", PARAM_LAST_NAME, nil],
-            [NSDictionary dictionaryWithObjectsAndKeys:@"Franky", PARAM_FIRST_NAME, [NSNull null], PARAM_LAST_NAME, nil],
+            [NSDictionary dictionaryWithObjectsAndKeys:@"Franky", PARAM_FIRST_NAME, @"Cats", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Jamie", PARAM_FIRST_NAME, @"Calder", PARAM_LAST_NAME, nil], nil];
 
     [VIPerson addWithArray:array forManagedObjectContext:nil];

@@ -10,7 +10,7 @@
 
 - (void)safeSetValue:(id)value forKey:(NSString *)key
 {
-    if (value && ![value isEqual:[NSNull null]]) {
+    if (value && ![[NSNull null] isEqual:value]) {
         [self setValue:value forKey:key];
     } else {
         [self setNilValueForKey:key];
