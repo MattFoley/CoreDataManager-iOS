@@ -18,7 +18,7 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 
 @interface VICoreDataManager : NSObject
 
-+ (VICoreDataManager *)getInstance;
++ (VICoreDataManager *)sharedInstance;
 
 - (NSManagedObjectContext *)managedObjectContext;
 

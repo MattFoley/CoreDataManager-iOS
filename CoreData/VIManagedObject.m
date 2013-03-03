@@ -20,12 +20,12 @@
 #pragma mark - Add Objects
 + (void)addWithArray:(NSArray *)inputArray forManagedObjectContext:(NSManagedObjectContext*)contextOrNil
 {
-    [[VICoreDataManager getInstance] importArray:inputArray forClass:[self class] withContext:contextOrNil];
+    [[VICoreDataManager sharedInstance] importArray:inputArray forClass:[self class] withContext:contextOrNil];
 }
 
 + (void)addWithDictionary:(NSDictionary *)inputDict forManagedObjectContext:(NSManagedObjectContext*)contextOrNil
 {
-    [[VICoreDataManager getInstance] importDictionary:inputDict forClass:[self class] withContext:contextOrNil];
+    [[VICoreDataManager sharedInstance] importDictionary:inputDict forClass:[self class] withContext:contextOrNil];
 }
 
 #pragma mark - Fetch with Object's Context
@@ -52,7 +52,7 @@
 
 + (NSArray *)fetchAllForPredicate:(NSPredicate *)predicate forManagedObjectContext:(NSManagedObjectContext *)contextOrNil
 {
-    NSArray *results = [[VICoreDataManager getInstance] arrayForClass:[self class]
+    NSArray *results = [[VICoreDataManager sharedInstance] arrayForClass:[self class]
                                                         withPredicate:predicate
                                                            forContext:contextOrNil];
     return results;

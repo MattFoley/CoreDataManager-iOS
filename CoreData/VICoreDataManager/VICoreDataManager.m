@@ -4,7 +4,6 @@
 //
 
 #import "VICoreDataManager.h"
-#import "VIEntityMetadataCache.h"
 
 NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED = @"CDICloudUpdated";
 
@@ -22,7 +21,6 @@ NSString *const iCloudLogsDirectoryName = @"Logs";
 @property NSString *iCloudAppId;
 @property NSString *bundleIdentifier;
 @property NSMutableDictionary *mapperCollection;
-@property VIEntityMetadataCache *metadataCache;
 
 - (NSBundle *)bundle;
 
@@ -68,10 +66,10 @@ static VICoreDataManager *_sharedObject = nil;
 + (void)initialize
 {
     //make sure the shared instance is ready
-    [self getInstance];
+    [self sharedInstance];
 }
 
-+ (VICoreDataManager *)getInstance
++ (VICoreDataManager *)sharedInstance
 {
     static dispatch_once_t pred;
     dispatch_once(&pred,^{

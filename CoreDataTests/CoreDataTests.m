@@ -21,7 +21,7 @@
 - (void)setUp
 {
     [super setUp];
-    [[VICoreDataManager getInstance] setResource:@"VICoreDataModel" database:@"VICoreDataModel.sqlite" iCloudAppId:nil forBundleIdentifier:@"vokal.CoreDataTests"];
+    [[VICoreDataManager sharedInstance] setResource:@"VICoreDataModel" database:@"VICoreDataModel.sqlite" iCloudAppId:nil forBundleIdentifier:@"vokal.CoreDataTests"];
     self.predicate = [NSPredicate predicateWithFormat:@"lastName == %@", @"Passley"];
     self.sortDescriptors = [NSArray arrayWithObjects:
                         [NSSortDescriptor sortDescriptorWithKey:@"lastName" ascending:YES],
@@ -34,7 +34,7 @@
     self.predicate = nil;
     self.sortDescriptors = nil;
     self.viewController = nil;
-    [[VICoreDataManager getInstance] resetCoreData];
+    [[VICoreDataManager sharedInstance] resetCoreData];
     [super tearDown];
 }
 
@@ -105,7 +105,7 @@
 - (void)updateVIPersonCoreData
 {
     
-    NSManagedObjectContext *context = [[VICoreDataManager getInstance] managedObjectContext];
+    NSManagedObjectContext *context = [[VICoreDataManager sharedInstance] managedObjectContext];
     //FOR REVIEW (see above):
     //NSManagedObjectContext *context = [[VICoreDataManager getInstance] startTransaction];
     NSArray *array = [NSArray arrayWithObjects:

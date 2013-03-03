@@ -24,7 +24,7 @@
     self = [super init];
 
     if (self) {
-        _managedObjectContext = [[VICoreDataManager getInstance] managedObjectContext];
+        _managedObjectContext = [[VICoreDataManager sharedInstance] managedObjectContext];
         _predicate = predicate;
         _sortDescriptors = sortDescriptors;
         _managedObjectClass = managedObjectClass;

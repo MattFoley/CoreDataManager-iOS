@@ -87,7 +87,7 @@
 
 - (void)resetCoreData
 {
-    NSManagedObjectContext *context = [[VICoreDataManager getInstance] startTransaction];
+    NSManagedObjectContext *context = [[VICoreDataManager sharedInstance] startTransaction];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:NSStringFromClass([VIPerson class]) inManagedObjectContext:context];
     [fetchRequest setEntity:entity];
@@ -96,9 +96,9 @@
     NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
     
     for (NSManagedObject *nsManagedObject in fetchedObjects) {
-        [[VICoreDataManager getInstance] deleteObject:nsManagedObject];
+        [[VICoreDataManager sharedInstance] deleteObject:nsManagedObject];
     }
-    [[VICoreDataManager getInstance] endTransactionForContext:context];
+    [[VICoreDataManager sharedInstance] endTransactionForContext:context];
 
 }
 
