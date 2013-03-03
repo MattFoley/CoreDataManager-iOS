@@ -17,7 +17,7 @@
     }
 }
 
-#pragma mark - Class Methods
+#pragma mark - Add Objects
 + (void)addWithArray:(NSArray *)inputArray forManagedObjectContext:(NSManagedObjectContext*)contextOrNil
 {
     [[VICoreDataManager getInstance] importArray:inputArray forClass:[self class] withContext:contextOrNil];
@@ -28,9 +28,26 @@
     [[VICoreDataManager getInstance] importDictionary:inputDict forClass:[self class] withContext:contextOrNil];
 }
 
+#pragma mark - Fetch with Object's Context
++ (BOOL)existsForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
+{
+    return [self existsForPredicate:predicate forManagedObjectContext:[managedObject managedObjectContext]];
+}
+
++ (NSArray *)fetchAllForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
+{
+    return [self fetchAllForPredicate:predicate forManagedObjectContext:[managedObject managedObjectContext]];
+}
+
++ (id)fetchForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
+{
+    return [self fetchForPredicate:predicate forManagedObjectContext:[managedObject managedObjectContext]];
+}
+
+#pragma mark - Fetch with Context
 + (BOOL)existsForPredicate:(NSPredicate *)predicate forManagedObjectContext:(NSManagedObjectContext *)contextOrNil
 {
-    return [self fetchForPredicate:predicate forManagedObjectContext:contextOrNil] != nil;
+    return [self fetchAllForPredicate:predicate forManagedObjectContext:contextOrNil] != nil;
 }
 
 + (NSArray *)fetchAllForPredicate:(NSPredicate *)predicate forManagedObjectContext:(NSManagedObjectContext *)contextOrNil
@@ -44,31 +61,6 @@
 + (id)fetchForPredicate:(NSPredicate *)predicate forManagedObjectContext:(NSManagedObjectContext *)contextOrNil
 {
     NSArray *results = [self fetchAllForPredicate:predicate forManagedObjectContext:contextOrNil];
-
-    if ([results count] > 0) {
-        return [results lastObject];
-    }
-
-    return nil;
-}
-
-+ (BOOL)existsForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
-{
-    return [self fetchForPredicate:predicate forManagedObject:managedObject] != nil;
-}
-
-+ (NSArray *)fetchAllForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
-{
-    NSArray *results = [[VICoreDataManager getInstance] arrayForClass:[self class]
-                                                        withPredicate:predicate
-                                                           forContext:[managedObject managedObjectContext]];
-
-    return results;
-}
-
-+ (id)fetchForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
-{
-    NSArray *results = [self fetchAllForPredicate:predicate forManagedObject:managedObject];
 
     if ([results count] > 0) {
         return [results lastObject];

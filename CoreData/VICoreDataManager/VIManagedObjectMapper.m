@@ -52,7 +52,6 @@
     }];
 }
 
-#pragma mark - Convenience Methods
 - (id)checkDate:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter
 {
     id date = [dateFormatter dateFromString:inputObject];
@@ -115,7 +114,7 @@
 
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)managedObject
 {
-    //this default mapper assumes that 
+    //this default mapper assumes that
     [inputDict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         id inputObject = obj;
         inputObject = [self checkNull:inputObject];
