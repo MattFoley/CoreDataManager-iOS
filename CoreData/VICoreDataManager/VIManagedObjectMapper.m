@@ -114,7 +114,7 @@
 
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)managedObject
 {
-    //this default mapper assumes that
+    //this default mapper assumes that local keys and entities match foreign keys and entities
     [inputDict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         id inputObject = obj;
         inputObject = [self checkNull:inputObject];
