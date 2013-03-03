@@ -36,7 +36,7 @@
     return [mapArray copy];
 }
 
-+ (NSDateFormatter *)internetDateFormetter
++ (NSDateFormatter *)defaultDateFormatter
 {
     static NSDateFormatter *df;
 

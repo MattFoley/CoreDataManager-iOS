@@ -8,18 +8,16 @@
 
 #import "VIManagedObjectMap.h"
 
-//default is VIManagedObjectMapOverwrite
-typedef NS_ENUM(NSUInteger, VIManagedObjectMapperDeleteRule){
-    VIManagedObjectMapperDeleteAll,    //delete all existing objects of a class before importing
-    VIManagedObjectMapperOverwrite,    //overwrite local changes with the new dictionary
-    VIManagedObjectMapperDoNotUpdate,  //leave existing objects alone
-};
-
 @interface VIManagedObjectMapper : NSObject
 
 @property NSString *uniqueComparisonKey;
-@property VIManagedObjectMapperDeleteRule deleteRule;
+@property BOOL deleteAllBeforeImport; //default is YES
+@property BOOL overwriteObjectsWithServerChanges; //default is YES
 
 + (instancetype)mapperWithUniqueKey:(NSString *)comparisonKey andMaps:(NSArray *)mapsArray;
++ (instancetype)defaultMapper;
 
+@end
+
+@interface VIManagedObjectDefaultMapper : VIManagedObjectMapper
 @end

@@ -17,8 +17,22 @@
     VIManagedObjectMapper *mapper = [[self alloc] init];
     [mapper setUniqueComparisonKey:comparisonKey];
     [mapper setMapsArray:[mapsArray copy]];
-    [mapper setDeleteRule:VIManagedObjectMapperOverwrite];
     return mapper;
+}
+
++ (instancetype)defaultMapper
+{
+    return [[VIManagedObjectDefaultMapper alloc] init];
+}
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        _deleteAllBeforeImport = YES;
+        _overwriteObjectsWithServerChanges = YES;
+    }
+    return self;
 }
 
 @end
@@ -30,33 +44,39 @@
         VIManagedObjectMap *map = obj;
         id inputObject = [inputDict objectForKey:map.inputKey];
 
-        //apply date formatter, if needed
-        if (map.dateFormatter && [inputObject isKindOfClass:[NSString class]]) {
-            inputObject = [map.dateFormatter dateFromString:inputObject];
-        }
-
         inputObject = [self checkNull:inputObject];
-        
-        //check for expected class
-        Class expectedClass = [self expectedClassForObject:managedObject andKey:map.coreDataKey];
-        if (![inputObject isKindOfClass:expectedClass]) {
-            NSLog(@"wrong kind of class for %@\nexpected: %@\nreceived: %@",managedObject,NSStringFromClass(expectedClass),NSStringFromClass([inputObject class]));
-            inputObject = nil;
-        }
+        inputObject = [self checkDate:inputObject withDateFormatter:map.dateFormatter];
+        inputObject = [self checkClass:inputObject managedObject:managedObject key:map.coreDataKey];
 
-        if (inputObject) {
-            [managedObject setValue:inputObject forKey:map.coreDataKey];
-        } else {
-            [managedObject setNilValueForKey:map.coreDataKey];
-        }
+        [managedObject safeSetValue:inputObject forKey:map.coreDataKey];
     }];
 }
 
 #pragma mark - Convenience Methods
+- (id)checkDate:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter
+{
+    id date = [dateFormatter dateFromString:inputObject];
+    if (date) {
+        return date;
+    }
+
+    return inputObject;
+}
+
 - (id)checkNull:(id)inputObject
 {
     if ([inputObject isEqual:[NSNull null]]) {
         return nil;
+    }
+    return inputObject;
+}
+
+- (id)checkClass:(id)inputObject managedObject:(NSManagedObject *)managedObject key:(NSString *)key
+{
+    Class expectedClass = [self expectedClassForObject:managedObject andKey:key];
+    if (![inputObject isKindOfClass:expectedClass]) {
+        NSLog(@"wrong kind of class for %@\nexpected: %@\nreceived: %@",managedObject,NSStringFromClass(expectedClass),NSStringFromClass([inputObject class]));
+        inputObject = nil;
     }
     return inputObject;
 }
@@ -89,5 +109,21 @@
     return nil;
 }
 
+@end
+
+@implementation VIManagedObjectDefaultMapper
+
+- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)managedObject
+{
+    //this default mapper assumes that 
+    [inputDict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        id inputObject = obj;
+        inputObject = [self checkNull:inputObject];
+        inputObject = [self checkDate:inputObject withDateFormatter:[VIManagedObjectMap defaultDateFormatter]];
+        inputObject = [self checkClass:inputObject managedObject:managedObject key:key];
+
+        [managedObject safeSetValue:inputObject forKey:key];
+    }];
+}
 
 @end

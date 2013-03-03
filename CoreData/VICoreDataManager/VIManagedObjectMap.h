@@ -12,7 +12,7 @@
 @property (nonatomic) NSDateFormatter *dateFormatter;
 
 //easy access to rfc3339, like "1985-04-12T23:20:50.52Z"
-+ (NSDateFormatter *)internetDateFormetter;
++ (NSDateFormatter *)defaultDateFormatter;
 
 + (instancetype)mapWithInput:(NSString *)inputKey output:(NSString *)outputKey;
 

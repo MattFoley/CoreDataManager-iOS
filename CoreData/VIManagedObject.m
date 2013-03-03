@@ -8,6 +8,16 @@
 
 @implementation NSManagedObject (VIManagedObjectAdditions)
 
+- (void)safeSetValue:(id)value forKey:(NSString *)key
+{
+    if (value && ![value isEqual:[NSNull null]]) {
+        [self setValue:value forKey:key];
+    } else {
+        [self setNilValueForKey:key];
+    }
+}
+
+#pragma mark - Class Methods
 + (void)addWithArray:(NSArray *)inputArray forManagedObjectContext:(NSManagedObjectContext*)contextOrNil
 {
     [[VICoreDataManager getInstance] importArray:inputArray forClass:[self class] withContext:contextOrNil];

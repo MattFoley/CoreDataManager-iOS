@@ -55,12 +55,12 @@
 {
     [self resetCoreData];
 
-    NSDictionary *dict = @{PARAM_FIRST_NAME : @"firstName",
-                           PARAM_LAST_NAME : @"lastName"};
-    NSArray *mapArray = [VIManagedObjectMap mapsFromDictionary:dict];
-    VIManagedObjectMapper *personMap = [VIManagedObjectMapper mapperWithUniqueKey:PARAM_LAST_NAME andMaps:mapArray];
-    [[VICoreDataManager getInstance] setObjectMapper:personMap forClass:[VIPerson class]];
-    
+//    NSDictionary *dict = @{PARAM_FIRST_NAME : @"firstName",
+//                           PARAM_LAST_NAME : @"lastName"};
+////    NSArray *mapArray = [VIManagedObjectMap mapsFromDictionary:dict];
+////    VIManagedObjectMapper *personMap = [VIManagedObjectMapper mapperWithUniqueKey:PARAM_LAST_NAME andMaps:mapArray];
+////    [[VICoreDataManager getInstance] setObjectMapper:personMap forClass:[VIPerson class]];
+
     NSArray *array = [NSArray arrayWithObjects:
             [NSDictionary dictionaryWithObjectsAndKeys:@"Anthony", PARAM_FIRST_NAME, @"Alesia", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Reid", PARAM_FIRST_NAME, @"Lappin", PARAM_LAST_NAME, nil],

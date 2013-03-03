@@ -7,6 +7,8 @@
 
 @interface NSManagedObject (VIManagedObjectAdditions)
 
+- (void)safeSetValue:(id)value forKey:(NSString *)key;
+
 //If contextOrNil is nil the main context will be used.
 + (void)addWithArray:(NSArray *)inputArray forManagedObjectContext:(NSManagedObjectContext*)contextOrNil;
 + (void)addWithDictionary:(NSDictionary *)inputDict forManagedObjectContext:(NSManagedObjectContext*)contextOrNil;
