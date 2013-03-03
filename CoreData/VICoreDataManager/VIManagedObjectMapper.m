@@ -5,6 +5,7 @@
 
 #import "VIManagedObjectMapper.h"
 #import "VICoreDataManager.h"
+#import "VIEntityMetadataCache.h"
 
 @interface VIManagedObjectMapper()
 @property NSMutableArray *mapsArray;
@@ -85,27 +86,7 @@
     NSEntityDescription *description = object.entity;
     NSDictionary *attributes = [description attributesByName];
     NSAttributeDescription *attributeDescription = [attributes valueForKey:key];
-    return [self classFromAttributeType:attributeDescription.attributeType];
-}
-
-- (Class)classFromAttributeType:(NSAttributeType)attributeType
-{
-    if (attributeType == NSDateAttributeType) {
-        return [NSDate class];
-    }
-    if (attributeType == NSStringAttributeType) {
-        return [NSString class];
-    }
-    if (attributeType == NSBinaryDataAttributeType) {
-        return [NSData class];
-    }
-    if (attributeType != 0 && attributeType < 1000) {
-        return [NSNumber class];
-    }
-
-    NSLog(@"there is an odd attribute type here");
-    NSLog(@"attribute is %d",attributeType);
-    return nil;
+    return NSClassFromString([attributeDescription attributeValueClassName]);
 }
 
 @end

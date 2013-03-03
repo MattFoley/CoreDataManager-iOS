@@ -36,7 +36,6 @@ NSString *const iCloudLogsDirectoryName = @"Logs";
 - (void)initManagedObjectModel;
 - (void)initPersistentStoreCoordinator;
 - (void)initManagedObjectContext;
-- (void)initMetadataCache;
 
 //Thread Safety with Main MOC
 - (NSManagedObjectContext *)threadSafeContext:(NSManagedObjectContext *)context;
@@ -217,16 +216,7 @@ static VICoreDataManager *_sharedObject = nil;
                                                          name:NSPersistentStoreDidImportUbiquitousContentChangesNotification
                                                        object:coordinator];
         }
-
-        if (!_metadataCache) {
-            [self initMetadataCache];
-        }
     }
-}
-
-- (void)initMetadataCache
-{
-    
 }
 
 #pragma mark - Create and configure
