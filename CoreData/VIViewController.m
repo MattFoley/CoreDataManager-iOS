@@ -57,8 +57,9 @@
 
     NSDictionary *dict = @{PARAM_FIRST_NAME : @"firstName",
                            PARAM_LAST_NAME : @"lastName"};
-    VIManagedObjectMapper *personMap = [VIManagedObjectMapper mapWithUniqueKey:@"lastName" mappingDictionary:dict];
-    [[VICoreDataManager getInstance] setObjectMap:personMap forClass:[VIPerson class]];
+    NSArray *mapArray = [VIManagedObjectMap mapsFromDictionary:dict];
+    VIManagedObjectMapper *personMap = [VIManagedObjectMapper mapperWithUniqueKey:PARAM_LAST_NAME andMaps:mapArray];
+    [[VICoreDataManager getInstance] setObjectMapper:personMap forClass:[VIPerson class]];
     
     NSArray *array = [NSArray arrayWithObjects:
             [NSDictionary dictionaryWithObjectsAndKeys:@"Anthony", PARAM_FIRST_NAME, @"Alesia", PARAM_LAST_NAME, nil],
@@ -78,6 +79,7 @@
             [NSDictionary dictionaryWithObjectsAndKeys:@"Brian", PARAM_FIRST_NAME, @"Flavin", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Max", PARAM_FIRST_NAME, @"Bare", PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Austin", PARAM_FIRST_NAME, @"Sheaffer", PARAM_LAST_NAME, nil],
+            [NSDictionary dictionaryWithObjectsAndKeys:@"Franky", PARAM_FIRST_NAME, [NSNull null], PARAM_LAST_NAME, nil],
             [NSDictionary dictionaryWithObjectsAndKeys:@"Jamie", PARAM_FIRST_NAME, @"Calder", PARAM_LAST_NAME, nil], nil];
 
     [VIPerson addWithArray:array forManagedObjectContext:nil];

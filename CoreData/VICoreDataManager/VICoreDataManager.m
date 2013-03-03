@@ -56,7 +56,7 @@ NSString *const iCloudLogsDirectoryName = @"Logs";
 
 //private interface to VIManagedObjectMap
 @interface VIManagedObjectMapper (setInformationFromDictionary)
-- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object;
+- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)managedObject;
 @end
 
 static VICoreDataManager *_sharedObject = nil;
@@ -223,10 +223,10 @@ static VICoreDataManager *_sharedObject = nil;
     return [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(managedObjectClass) inManagedObjectContext:contextOrNil];
 }
 
-- (BOOL)setObjectMapper:(VIManagedObjectMapper *)objMap forClass:(Class)objectClass
+- (BOOL)setObjectMapper:(VIManagedObjectMapper *)objMapper forClass:(Class)objectClass
 {
-    if (objMap && objectClass) {
-        [self.mapCollection setObject:objMap forKey:NSStringFromClass(objectClass)];
+    if (objMapper && objectClass) {
+        [self.mapCollection setObject:objMapper forKey:NSStringFromClass(objectClass)];
         return YES;
     }
 
@@ -260,11 +260,11 @@ static VICoreDataManager *_sharedObject = nil;
 
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ == %@",uniqueKey,inputValue];
 
-    NSArray *existingArray = [self arrayForClass:objectClass withPredicate:predicate forContext:contextOrNil];
-    NSAssert([existingArray count] < 2, @"UNIQUE IDENTIFIER IS NOT UNIQUE. MORE THAN ONE MATCHING OBJECT FOUND");
+    NSArray *existingObjectArray = [self arrayForClass:objectClass withPredicate:predicate forContext:contextOrNil];
+    NSAssert([existingObjectArray count] < 2, @"UNIQUE IDENTIFIER IS NOT UNIQUE. MORE THAN ONE MATCHING OBJECT FOUND");
 
-    if ([existingArray count]) {
-        NSManagedObject *existingObject = existingArray[0];
+    if ([existingObjectArray count]) {
+        NSManagedObject *existingObject = existingObjectArray[0];
         [self setInformationFromDictionary:inputDict forManagedObject:existingObject];
     } else if (mapper.deleteRule == VIManagedObjectMapperOverwrite) {
         NSManagedObject *aNewObject = [self addObjectForClass:objectClass forContext:contextOrNil];

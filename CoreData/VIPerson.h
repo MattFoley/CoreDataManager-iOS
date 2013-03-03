@@ -8,8 +8,8 @@
 
 #import "VICoreDataManager.h"
 
-static NSString *const PARAM_FIRST_NAME = @"firstName";
-static NSString *const PARAM_LAST_NAME = @"lastName";
+static NSString *const PARAM_FIRST_NAME = @"serverFirstName";
+static NSString *const PARAM_LAST_NAME = @"serverLastName";
 
 @interface VIPerson : NSManagedObject
 

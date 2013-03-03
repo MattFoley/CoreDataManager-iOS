@@ -4,34 +4,39 @@
 //
 
 #import "VIManagedObjectMap.h"
+#import "VICoreDataManager.h"
 
 @implementation VIManagedObjectMap
 
 + (instancetype)mapWithInput:(NSString *)inputKey output:(NSString *)outputKey
 {
-    return [self mapWithInput:inputKey output:outputKey expectedClass:[NSString class]];
+    return [self mapWithInput:inputKey output:outputKey dateFormatter:nil];
 }
 
 + (instancetype)mapWithInput:(NSString *)inputKey
                       output:(NSString *)outputKey
-               expectedClass:(Class)expectedClass
-{
-    return [self mapWithInput:inputKey output:outputKey expectedClass:[NSString class] dateFormatter:nil];
-}
-
-+ (instancetype)mapWithInput:(NSString *)inputKey
-                      output:(NSString *)outputKey
-               expectedClass:(Class)expectedClass
                dateFormatter:(NSDateFormatter *)dateFormatter
 {
     VIManagedObjectMap *map = [[self alloc] init];
     [map setInputKey:inputKey];
-    
-    
+    [map setCoreDataKey:outputKey];
+    [map setDateFormatter:dateFormatter];
+    return map;
 }
 
-//default date handling
-+ (NSDate *)dateFromInternetDate:(NSString *)dateString
++ (NSArray *)mapsFromDictionary:(NSDictionary *)mapDict
+{
+    NSMutableArray *mapArray = [NSMutableArray array];
+
+    [mapDict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        //key = input key, obj = core data key
+        [mapArray addObject:[self mapWithInput:key output:obj]];
+    }];
+
+    return [mapArray copy];
+}
+
++ (NSDateFormatter *)internetDateFormetter
 {
     static NSDateFormatter *df;
 
@@ -41,15 +46,6 @@
         [df setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
     }
     return df;
-}
-
-- (void)dateFormatter
-{
-    if (_dateFormatter) {
-        return _dateFormatter;
-    }
-
-    return [[self class] dateFromInternetDate];
 }
 
 @end

@@ -16,6 +16,7 @@ typedef NS_ENUM(NSUInteger, VIManagedObjectMapperDeleteRule){
 };
 
 @interface VIManagedObjectMapper : NSObject
+
 @property NSString *uniqueComparisonKey;
 @property VIManagedObjectMapperDeleteRule deleteRule;
 
