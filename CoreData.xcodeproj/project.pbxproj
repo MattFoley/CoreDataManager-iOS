@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3D07940416E3DB9300E29F5F /* VIPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D07940316E3DB9300E29F5F /* VIPerson.m */; };
+		3D015C0316E7B78F0071B3D2 /* VITeam.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D015C0216E7B78F0071B3D2 /* VITeam.m */; };
+		3D015C0616E7B79D0071B3D2 /* VIPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D015C0516E7B79D0071B3D2 /* VIPerson.m */; };
 		3D095BD216E274340074CBA2 /* VIManagedObjectMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D095BD116E274340074CBA2 /* VIManagedObjectMapper.m */; };
 		3D095BD516E28A980074CBA2 /* VIManagedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D095BD416E28A980074CBA2 /* VIManagedObject.m */; };
 		3DDBEC0C16E2B85D00E9AB57 /* VIManagedObjectMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DDBEC0B16E2B85D00E9AB57 /* VIManagedObjectMap.m */; };
@@ -38,8 +39,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3D07940216E3DB9300E29F5F /* VIPerson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIPerson.h; sourceTree = "<group>"; };
-		3D07940316E3DB9300E29F5F /* VIPerson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIPerson.m; sourceTree = "<group>"; };
+		3D015C0116E7B78F0071B3D2 /* VITeam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VITeam.h; sourceTree = "<group>"; };
+		3D015C0216E7B78F0071B3D2 /* VITeam.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VITeam.m; sourceTree = "<group>"; };
+		3D015C0416E7B79D0071B3D2 /* VIPerson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIPerson.h; sourceTree = "<group>"; };
+		3D015C0516E7B79D0071B3D2 /* VIPerson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VIPerson.m; sourceTree = "<group>"; };
 		3D095BD016E274340074CBA2 /* VIManagedObjectMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VIManagedObjectMapper.h; path = VICoreDataManager/VIManagedObjectMapper.h; sourceTree = "<group>"; };
 		3D095BD116E274340074CBA2 /* VIManagedObjectMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VIManagedObjectMapper.m; path = VICoreDataManager/VIManagedObjectMapper.m; sourceTree = "<group>"; };
 		3D095BD316E28A980074CBA2 /* VIManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VIManagedObject.h; sourceTree = "<group>"; };
@@ -226,8 +229,10 @@
 			isa = PBXGroup;
 			children = (
 				EA4FE17715C2EEC700424469 /* VICoreDataModel.xcdatamodeld */,
-				3D07940216E3DB9300E29F5F /* VIPerson.h */,
-				3D07940316E3DB9300E29F5F /* VIPerson.m */,
+				3D015C0416E7B79D0071B3D2 /* VIPerson.h */,
+				3D015C0516E7B79D0071B3D2 /* VIPerson.m */,
+				3D015C0116E7B78F0071B3D2 /* VITeam.h */,
+				3D015C0216E7B78F0071B3D2 /* VITeam.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -361,7 +366,8 @@
 				3D095BD216E274340074CBA2 /* VIManagedObjectMapper.m in Sources */,
 				3D095BD516E28A980074CBA2 /* VIManagedObject.m in Sources */,
 				3DDBEC0C16E2B85D00E9AB57 /* VIManagedObjectMap.m in Sources */,
-				3D07940416E3DB9300E29F5F /* VIPerson.m in Sources */,
+				3D015C0316E7B78F0071B3D2 /* VITeam.m in Sources */,
+				3D015C0616E7B79D0071B3D2 /* VIPerson.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

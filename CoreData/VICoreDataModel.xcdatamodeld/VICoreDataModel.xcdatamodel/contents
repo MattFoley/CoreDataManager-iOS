@@ -3,8 +3,15 @@
     <entity name="VIPerson" representedClassName="VIPerson" syncable="YES">
         <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="spouse" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="VIPerson" inverseName="spouse" inverseEntity="VIPerson" syncable="YES"/>
+        <relationship name="team" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="VITeam" inverseName="teamMembers" inverseEntity="VITeam" syncable="YES"/>
+    </entity>
+    <entity name="VITeam" representedClassName="VITeam" syncable="YES">
+        <attribute name="teamName" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="teamMembers" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="VIPerson" inverseName="team" inverseEntity="VIPerson" syncable="YES"/>
     </entity>
     <elements>
-        <element name="VIPerson" positionX="160" positionY="192" width="128" height="75"/>
+        <element name="VIPerson" positionX="160" positionY="192" width="128" height="105"/>
+        <element name="VITeam" positionX="160" positionY="192" width="128" height="75"/>
     </elements>
 </model>

@@ -233,23 +233,26 @@ static VICoreDataManager *_sharedObject = nil;
     return NO;
 }
 
-- (void)importArray:(NSArray *)inputArray forClass:(Class)objectClass withContext:(NSManagedObjectContext*)contextOrNil
+- (NSArray *)importArray:(NSArray *)inputArray forClass:(Class)objectClass withContext:(NSManagedObjectContext*)contextOrNil;
 {
     VIManagedObjectMapper *mapper = [self mapperForClass:objectClass];
     if (mapper.deleteAllBeforeImport) {
         [self deleteAllObjectsOfClass:objectClass context:contextOrNil];
     }
 
+    NSMutableArray *returnArray = [NSMutableArray array];
     [inputArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         if ([obj isKindOfClass:[NSDictionary class]]) {
-            [self importDictionary:obj forClass:objectClass withContext:contextOrNil];
+            [returnArray addObject:[self importDictionary:obj forClass:objectClass withContext:contextOrNil]];
         } else {
             NSLog(@"ERROR\n %s \nexpecting an NSArray full of NSDictionaries", __PRETTY_FUNCTION__);
         }
     }];
+
+    return [returnArray copy];
 }
 
-- (void)importDictionary:(NSDictionary *)inputDict forClass:(Class)objectClass withContext:(NSManagedObjectContext *)contextOrNil
+- (NSManagedObject *)importDictionary:(NSDictionary *)inputDict forClass:(Class)objectClass withContext:(NSManagedObjectContext *)contextOrNil
 {
     contextOrNil = [self threadSafeContext:contextOrNil];
     
@@ -259,18 +262,20 @@ static VICoreDataManager *_sharedObject = nil;
     NSArray *existingObjectArray;
     if (uniqueKey) {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ == %@",uniqueKey,[inputDict objectForKey:uniqueKey]];
-
         existingObjectArray = [self arrayForClass:objectClass withPredicate:predicate forContext:contextOrNil];
         NSAssert([existingObjectArray count] < 2, @"UNIQUE IDENTIFIER IS NOT UNIQUE. MORE THAN ONE MATCHING OBJECT FOUND");
     }
 
+    NSManagedObject *returnObject;
     if ([existingObjectArray count] && mapper.overwriteObjectsWithServerChanges) {
-        NSManagedObject *existingObject = existingObjectArray[0];
-        [self setInformationFromDictionary:inputDict forManagedObject:existingObject];
+        returnObject = existingObjectArray[0];
+        [self setInformationFromDictionary:inputDict forManagedObject:returnObject];
     } else {
-        NSManagedObject *aNewObject = [self addObjectForClass:objectClass forContext:contextOrNil];
-        [self setInformationFromDictionary:inputDict forManagedObject:aNewObject];
+        returnObject = [self addObjectForClass:objectClass forContext:contextOrNil];
+        [self setInformationFromDictionary:inputDict forManagedObject:returnObject];
     }
+
+    return returnObject;
 }
 
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object

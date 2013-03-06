@@ -2,18 +2,20 @@
 //  VIPerson.h
 //  CoreData
 //
+//  Created by Sean Wolter on 3/6/13.
+//
+//
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-#import "VICoreDataManager.h"
-
-static NSString *const PARAM_FIRST_NAME = @"firstName";
-static NSString *const PARAM_LAST_NAME = @"lastName";
+@class VIPerson, VITeam;
 
 @interface VIPerson : NSManagedObject
 
-@property (nonatomic, retain) NSString *firstName;
-@property (nonatomic, retain) NSString *lastName;
+@property (nonatomic, retain) NSString * firstName;
+@property (nonatomic, retain) NSString * lastName;
+@property (nonatomic, retain) VITeam *team;
+@property (nonatomic, retain) VIPerson *spouse;
 
 @end

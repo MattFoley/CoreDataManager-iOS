@@ -30,8 +30,8 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 //If contextOrNil is nil the main context will be used.
 - (NSManagedObject *)addObjectForClass:(Class)managedObjectClass forContext:(NSManagedObjectContext *)contextOrNil;
 - (BOOL)setObjectMapper:(VIManagedObjectMapper *)objMap forClass:(Class)objectClass;
-- (void)importArray:(NSArray *)inputArray forClass:(Class)objectClass withContext:(NSManagedObjectContext*)contextOrNil;
-- (void)importDictionary:(NSDictionary *)inputDict forClass:(Class)objectClass withContext:(NSManagedObjectContext *)contextOrNil;
+- (NSArray *)importArray:(NSArray *)inputArray forClass:(Class)objectClass withContext:(NSManagedObjectContext*)contextOrNil;
+- (NSManagedObject *)importDictionary:(NSDictionary *)inputDict forClass:(Class)objectClass withContext:(NSManagedObjectContext *)contextOrNil;
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object;
 
 //Fetch and delete NSManagedObject subclasses
