@@ -41,11 +41,10 @@
 
 - (void)setResource:(NSString *)resource database:(NSString *)database
 {
-   
     _resource = resource;
     _database = database;
     
-     [self managedObjectContext];
+    [self managedObjectContext];
 }
 
 #pragma mark - CDMethods
@@ -53,7 +52,7 @@
 - (id)addObjectForModel:(NSString *)model context:(NSManagedObjectContext *)context 
 {
     return [NSEntityDescription insertNewObjectForEntityForName:model
-                                              inManagedObjectContext:context];
+                                         inManagedObjectContext:context];
 }
 
 - (NSArray *)arrayForModel:(NSString *)model 
@@ -63,23 +62,27 @@
 
 - (NSArray *)arrayForModel:(NSString *)model forContext:(NSManagedObjectContext *)context
 {
-    NSEntityDescription *entity = [NSEntityDescription entityForName:model
-                                              inManagedObjectContext:context];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    [fetchRequest setEntity:entity];
-    
-    return [context executeFetchRequest:fetchRequest error:nil];
+    return [self arrayForModel:model withPredicate:nil forContext:context];
 }
 
 - (NSArray *)arrayForModel:(NSString *)model withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)context
 {
+    NSLog(@"%@", predicate.predicateFormat);
     NSEntityDescription *entity = [NSEntityDescription entityForName:model
                                               inManagedObjectContext:context];
+    
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:entity];
-    [fetchRequest setPredicate:predicate];
     
-    return [context executeFetchRequest:fetchRequest error:nil];
+    [fetchRequest setPredicate:predicate];
+
+    NSArray *results;
+    static NSString *mainContext = @"mainContext";
+    @synchronized (mainContext){
+        results = [context executeFetchRequest:fetchRequest error:nil];
+    }
+    
+    return results;
 }
 
 - (void)deleteObject:(id)object 
@@ -98,6 +101,8 @@
 
 - (void)saveContext:(NSManagedObjectContext *)managedObjectContex
 {
+    managedObjectContex = [self safeContext:managedObjectContex];
+    
     NSError *error = nil;
     if (managedObjectContex != nil) {
         if ([managedObjectContex hasChanges] && ![managedObjectContex save:&error]) {
@@ -137,6 +142,21 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DATA_UPDATED
                                                         object:nil];
+}
+
+- (NSManagedObjectContext *)safeContext:(NSManagedObjectContext *)context
+{
+    if (context == nil) {
+        context = self.managedObjectContext;
+    }
+    
+    if (context == self.managedObjectContext) {
+        NSAssert(dispatch_get_current_queue() == dispatch_get_main_queue(), @"NOT ON MAIN QUEUE!");
+    } else {
+        NSAssert(dispatch_get_current_queue() != dispatch_get_main_queue(), @"NOT ON SECONDARY QUEUE!");
+    }
+    
+    return context;
 }
 
 - (void)dropTableForEntityWithName:(NSString*)name
@@ -191,32 +211,33 @@
 
 - (NSManagedObjectContext *)managedObjectContext
 {
-    if (_managedObjectContext != nil) {
-        return _managedObjectContext;
-    }
-    
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-    
-    if (coordinator != nil) {
-        _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+
+    if (_managedObjectContext == nil) {
         
-        [_managedObjectContext performBlockAndWait:^{
-            [_managedObjectContext setPersistentStoreCoordinator:coordinator];
-            [_managedObjectContext setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy];
+        NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+        
+        if (coordinator != nil) {
+            _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
             
-            if ([_iCloudAppId length] > 0) {
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(mergeChangesFrom_iCloud:)
-                                                             name:NSPersistentStoreDidImportUbiquitousContentChangesNotification
-                                                           object:coordinator];
-            }
-        }];
+            [_managedObjectContext performBlockAndWait:^{
+                [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+                [_managedObjectContext setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy];
+                
+                if ([_iCloudAppId length] > 0) {
+                    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                             selector:@selector(mergeChangesFrom_iCloud:)
+                                                                 name:NSPersistentStoreDidImportUbiquitousContentChangesNotification
+                                                               object:coordinator];
+                }
+            }];
+        }
     }
+    
     
     return _managedObjectContext;
 }
 
-- (NSManagedObjectContext *)tempManagedObjectContext 
+- (NSManagedObjectContext *)tempManagedObjectContext
 {
     NSManagedObjectContext *tempManagedObjectContext = nil;
     
