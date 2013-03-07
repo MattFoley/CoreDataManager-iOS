@@ -67,7 +67,7 @@
 
 - (NSArray *)arrayForModel:(NSString *)model withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)context
 {
-    NSLog(@"%@", predicate.predicateFormat);
+    DLog(@"%@", predicate.predicateFormat);
     NSEntityDescription *entity = [NSEntityDescription entityForName:model
                                               inManagedObjectContext:context];
     
