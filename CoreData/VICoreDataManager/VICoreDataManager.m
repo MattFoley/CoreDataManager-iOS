@@ -78,10 +78,9 @@
 
     NSArray *results;
     static NSString *mainContext = @"mainContext";
-    @synchronized (mainContext){
-        results = [context executeFetchRequest:fetchRequest error:nil];
-    }
+    results = [context executeFetchRequest:fetchRequest error:nil];
     
+    DLog(@"finished read");
     return results;
 }
 
@@ -153,7 +152,7 @@
     if (context == self.managedObjectContext) {
         NSAssert(dispatch_get_current_queue() == dispatch_get_main_queue(), @"NOT ON MAIN QUEUE!");
     } else {
-        NSAssert(dispatch_get_current_queue() != dispatch_get_main_queue(), @"NOT ON SECONDARY QUEUE!");
+        //NSAssert(dispatch_get_current_queue() != dispatch_get_main_queue(), @"NOT ON SECONDARY QUEUE!");
     }
     
     return context;
