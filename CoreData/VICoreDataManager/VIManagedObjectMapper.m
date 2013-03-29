@@ -60,7 +60,7 @@
 {
     Class expectedClass = [self expectedClassForObject:managedObject andKey:key];
     if (![inputObject isKindOfClass:expectedClass]) {
-        NSLog(@"wrong kind of class for %@\nexpected: %@\nreceived: %@",managedObject,NSStringFromClass(expectedClass),NSStringFromClass([inputObject class]));
+        NSLog(@"Wrong kind of class for %@\nExpected: %@\nReceived: %@",managedObject,NSStringFromClass(expectedClass),NSStringFromClass([inputObject class]));
         inputObject = nil;
     }
     return inputObject;
