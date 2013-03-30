@@ -38,13 +38,13 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 - (BOOL)setObjectMapper:(VIManagedObjectMapper *)objMap
                forClass:(Class)objectClass;
 
-- (void)importArray:(NSArray *)inputArray
-           forClass:(Class)objectClass
-        withContext:(NSManagedObjectContext*)contextOrNil;
-
-- (void)importDictionary:(NSDictionary *)inputDict
+- (NSArray *)importArray:(NSArray *)inputArray
                 forClass:(Class)objectClass
-             withContext:(NSManagedObjectContext *)contextOrNil;
+             withContext:(NSManagedObjectContext*)contextOrNil;
+
+- (NSManagedObject *)importDictionary:(NSDictionary *)inputDict
+                             forClass:(Class)objectClass
+                          withContext:(NSManagedObjectContext *)contextOrNil;
 
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict
                     forManagedObject:(NSManagedObject *)object;
