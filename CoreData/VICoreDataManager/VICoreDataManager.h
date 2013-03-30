@@ -23,25 +23,45 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 - (NSManagedObjectContext *)managedObjectContext;
 
 //be sure to use one of these setup methods before interacting with Core Data
-- (void)setResource:(NSString *)resource database:(NSString *)database;
-- (void)setResource:(NSString *)resource database:(NSString *)database iCloudAppId:(NSString *)iCloudAppId;
+- (void)setResource:(NSString *)resource
+           database:(NSString *)database;
+
+- (void)setResource:(NSString *)resource
+           database:(NSString *)database
+        iCloudAppId:(NSString *)iCloudAppId;
 
 //Create and configure new NSManagedObject subclasses
 //If contextOrNil is nil the main context will be used.
-- (NSManagedObject *)addObjectForClass:(Class)managedObjectClass forContext:(NSManagedObjectContext *)contextOrNil;
-- (BOOL)setObjectMapper:(VIManagedObjectMapper *)objMap forClass:(Class)objectClass;
-- (NSArray *)importArray:(NSArray *)inputArray forClass:(Class)objectClass withContext:(NSManagedObjectContext*)contextOrNil;
-- (NSManagedObject *)importDictionary:(NSDictionary *)inputDict forClass:(Class)objectClass withContext:(NSManagedObjectContext *)contextOrNil;
-- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object;
+- (NSManagedObject *)addObjectForClass:(Class)managedObjectClass
+                            forContext:(NSManagedObjectContext *)contextOrNil;
+
+- (BOOL)setObjectMapper:(VIManagedObjectMapper *)objMap
+               forClass:(Class)objectClass;
+
+- (void)importArray:(NSArray *)inputArray
+           forClass:(Class)objectClass
+        withContext:(NSManagedObjectContext*)contextOrNil;
+
+- (void)importDictionary:(NSDictionary *)inputDict
+                forClass:(Class)objectClass
+             withContext:(NSManagedObjectContext *)contextOrNil;
+
+- (void)setInformationFromDictionary:(NSDictionary *)inputDict
+                    forManagedObject:(NSManagedObject *)object;
 
 //Fetch and delete NSManagedObject subclasses
 //NOT threadsafe! Be sure to use a temp context if you are NOT on the main thread.
 - (NSArray *)arrayForClass:(Class)managedObjectClass;
-- (NSArray *)arrayForClass:(Class)managedObjectClass forContext:(NSManagedObjectContext *)contextOrNil;
-- (NSArray *)arrayForClass:(Class)managedObjectClass withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)contextOrNil;
+- (NSArray *)arrayForClass:(Class)managedObjectClass
+                forContext:(NSManagedObjectContext *)contextOrNil;
+
+- (NSArray *)arrayForClass:(Class)managedObjectClass
+             withPredicate:(NSPredicate *)predicate
+                forContext:(NSManagedObjectContext *)contextOrNil;
 
 - (void)deleteObject:(NSManagedObject *)object;
-- (BOOL)deleteAllObjectsOfClass:(Class)managedObjectClass context:(NSManagedObjectContext *)contextOrNil;
+- (BOOL)deleteAllObjectsOfClass:(Class)managedObjectClass
+                        context:(NSManagedObjectContext *)contextOrNil;
 
 //This saves the main context asynchronously on the main thread
 - (void)saveMainContext;
