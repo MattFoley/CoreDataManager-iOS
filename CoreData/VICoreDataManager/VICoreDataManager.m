@@ -5,11 +5,6 @@
 
 #import "VICoreDataManager.h"
 
-NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED = @"CDICloudUpdated";
-
-NSString *const iCloudDataDirectoryName = @"Data.nosync";
-NSString *const iCloudLogsDirectoryName = @"Logs";
-
 @interface VICoreDataManager () {
     NSManagedObjectContext *_managedObjectContext;
     NSManagedObjectModel *_managedObjectModel;
@@ -18,7 +13,6 @@ NSString *const iCloudLogsDirectoryName = @"Logs";
 
 @property NSString *resource;
 @property NSString *databaseFilename;
-@property NSString *iCloudAppId;
 @property NSString *bundleIdentifier;
 @property NSMutableDictionary *mapperCollection;
 
@@ -86,20 +80,14 @@ static VICoreDataManager *_sharedObject = nil;
 
 - (void)setResource:(NSString *)resource database:(NSString *)database
 {
-    [self setResource:resource database:database iCloudAppId:nil];
+    [self setResource:resource database:database forBundleIdentifier:nil];
 }
 
-- (void)setResource:(NSString *)resource database:(NSString *)database iCloudAppId:(NSString *)iCloudAppId
-{
-    [self setResource:resource database:database iCloudAppId:iCloudAppId forBundleIdentifier:nil];
-}
-
-- (void)setResource:(NSString *)resource database:(NSString *)database iCloudAppId:(NSString *)iCloudAppId forBundleIdentifier:(NSString *)bundleIdentifier
+- (void)setResource:(NSString *)resource database:(NSString *)database forBundleIdentifier:(NSString *)bundleIdentifier
 {
     //this method is publicized in unit tests
     self.resource = resource;
     self.databaseFilename = database;
-    self.iCloudAppId = iCloudAppId;
     self.bundleIdentifier = bundleIdentifier;
 }
 
@@ -181,9 +169,7 @@ static VICoreDataManager *_sharedObject = nil;
     NSError *error;
     _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
 
-    if ([self.iCloudAppId length]) {
-        [self setupiCloudForPersistantStoreCoordinator:_persistentStoreCoordinator];
-    } else if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
+    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
                                                           configuration:nil
                                                                     URL:storeURL
                                                                 options:options
@@ -202,14 +188,6 @@ static VICoreDataManager *_sharedObject = nil;
         [_managedObjectContext setPersistentStoreCoordinator:coordinator];
         id mergePolicy = [[NSMergePolicy alloc] initWithMergeType:NSMergeByPropertyObjectTrumpMergePolicyType];
         [_managedObjectContext setMergePolicy:mergePolicy];
-
-
-        if ([_iCloudAppId length]) {
-            [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(mergeChangesFromiCloud:)
-                                                         name:NSPersistentStoreDidImportUbiquitousContentChangesNotification
-                                                       object:coordinator];
-        }
     }
 }
 
@@ -392,7 +370,7 @@ static VICoreDataManager *_sharedObject = nil;
     });
 }
 
-- (NSManagedObjectContext *)startTransaction
+- (NSManagedObjectContext *)temporaryContext
 {
     return [self tempManagedObjectContext];
 }

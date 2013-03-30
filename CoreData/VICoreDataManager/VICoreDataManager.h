@@ -26,10 +26,6 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 - (void)setResource:(NSString *)resource
            database:(NSString *)database;
 
-- (void)setResource:(NSString *)resource
-           database:(NSString *)database
-        iCloudAppId:(NSString *)iCloudAppId;
-
 //Create and configure new NSManagedObject subclasses
 //If contextOrNil is nil the main context will be used.
 - (NSManagedObject *)addObjectForClass:(Class)managedObjectClass
