@@ -6,7 +6,6 @@
 #import "VIViewController.h"
 #import "VICoreDataManager.h"
 #import "VIPerson.h"
-#import "VITeam.h"
 
 @interface VIViewController ()
 
@@ -58,21 +57,55 @@
     [[VICoreDataManager sharedInstance] resetCoreData];
 
     int i = 0;
-    while (i < 50 ) {
-        id thing = [VIPerson addWithDictionary:[self makePersonDict] forManagedObjectContext:nil];
-        NSLog(@"here's the thing %@",thing);
-        ++i;
+
+    //MAKE 20 PEOPLE WITH THE DEFAULT MAPPER
+    while (i < 20 ) {
+        NSLog(@"%@",[VIPerson addWithDictionary:[self makePersonDictForDefaultMapper] forManagedObjectContext:nil]);
+        i++;
+    }
+
+
+    //MAKE 20 PEOPLE WITH A CUSTOM MAPPER
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"dd' 'LLL' 'yy' 'HH:mm"];
+    [df setTimeZone:[NSTimeZone localTimeZone]];
+
+    NSArray *maps = @[[VIManagedObjectMap mapWithInput:@"first" output:@"firstName"],
+                      [VIManagedObjectMap mapWithInput:@"last" output:@"lastName"],
+                      [VIManagedObjectMap mapWithInput:@"date_of_birth" output:@"birthDay" dateFormatter:df],
+                      [VIManagedObjectMap mapWithInput:@"cat_num" output:@"numberOfCats"],
+                      [VIManagedObjectMap mapWithInput:@"CR_PREF" output:@"lovesCoolRanch"]];
+    VIManagedObjectMapper *mapper = [VIManagedObjectMapper mapperWithUniqueKey:@"lastName" andMaps:maps];
+    [[VICoreDataManager sharedInstance] setObjectMapper:mapper forClass:[VIPerson class]];
+
+    while (i < 20 ) {
+        NSLog(@"%@",[VIPerson addWithDictionary:[self makePersonDictForCustomMapper] forManagedObjectContext:nil]);
+        i++;
     }
 }
 
-- (NSDictionary *)makePersonDict
+- (NSString *)randomNumber
 {
-    int fVoid = arc4random()%3000;
-    NSString *fName = [NSString stringWithFormat:@"%d",fVoid];
-    int lVoid = arc4random()%3000;
-    NSString *lName = [NSString stringWithFormat:@"%d",lVoid];
-    NSDictionary *dict = @{@"firstName" : fName ,
-                           @"lastName" : lName };
+    return [NSString stringWithFormat:@"%d",arc4random()%3000];
+}
+
+- (NSDictionary *)makePersonDictForDefaultMapper
+{
+    NSDictionary *dict = @{@"firstName" :  [self randomNumber],
+                           @"lastName" : [self randomNumber] ,
+                           @"birthDay" : @"1983-07-24T03:22:15Z",
+                           @"numberOfCats" : @17,
+                           @"lovesCoolRanch" : @NO};
+    return dict;
+}
+
+- (NSDictionary *)makePersonDictForCustomMapper
+{
+    NSDictionary *dict = @{@"first" :  [self randomNumber],
+                           @"last" : [self randomNumber] ,
+                           @"date_of_birth" : @"24 Jul 83 14:16",
+                           @"cat_num" : @17,
+                           @"CR_PREF" : @NO};
     return dict;
 }
 

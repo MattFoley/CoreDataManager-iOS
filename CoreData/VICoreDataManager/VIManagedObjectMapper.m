@@ -10,7 +10,7 @@
 @property NSArray *mapsArray;
 - (id)checkNull:(id)inputObject;
 - (id)checkDate:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter;
-- (id)checkString:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter;
+- (id)checkString:(id)outputObject withDateFormatter:(NSDateFormatter *)dateFormatter;
 - (BOOL)checkClass:(id)inputObject managedObject:(NSManagedObject *)object key:(NSString *)key;
 - (Class)expectedClassForObject:(NSManagedObject *)object andKey:(id)key;
 @end
@@ -50,6 +50,9 @@
 
 - (id)checkDate:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter
 {
+    if (![inputObject isKindOfClass:[NSString class]]) {
+        return inputObject;
+    }
     id date = [dateFormatter dateFromString:inputObject];
     if (!date) {
         return inputObject;
@@ -57,11 +60,14 @@
     return date;
 }
 
-- (id)checkString:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter
+- (id)checkString:(id)outputObject withDateFormatter:(NSDateFormatter *)dateFormatter
 {
-    id dateString = [dateFormatter stringFromDate:inputObject];
+    if (![outputObject isKindOfClass:[NSDate class]]) {
+        return outputObject;
+    }
+    id dateString = [dateFormatter stringFromDate:outputObject];
     if (!dateString) {
-        return inputObject;
+        return outputObject;
     }
     return dateString;
 }
@@ -91,9 +97,9 @@
     [self.mapsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         VIManagedObjectMap *aMap = obj;
         id inputObject = [inputDict objectForKey:aMap.inputKey];
+        inputObject = [self checkDate:inputObject withDateFormatter:aMap.dateFormatter];
         if ([self checkClass:inputObject managedObject:object key:aMap.coreDataKey]) {
             inputObject = [self checkNull:inputObject];
-            inputObject = [self checkDate:inputObject withDateFormatter:aMap.dateFormatter];
             [object safeSetValue:inputObject forKey:aMap.coreDataKey];
         }
     }];
@@ -119,9 +125,9 @@
     //this default mapper assumes that local keys and entities match foreign keys and entities
     [inputDict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         id inputObject = obj;
+        inputObject = [self checkDate:inputObject withDateFormatter:[VIManagedObjectMap defaultDateFormatter]];
         if ([self checkClass:inputObject managedObject:object key:key]) {
             inputObject = [self checkNull:inputObject];
-            inputObject = [self checkDate:inputObject withDateFormatter:[VIManagedObjectMap defaultDateFormatter]];
             [object safeSetValue:inputObject forKey:key];
         }
     }];
