@@ -229,11 +229,11 @@
     contextOrNil = [self threadSafeContext:contextOrNil];
     
     VIManagedObjectMapper *mapper = [self mapperForClass:objectClass];
-    NSString *uniqueKey = [mapper uniqueComparisonKey];
+    NSString *uniqueKey = mapper.uniqueComparisonKey;
 
     NSArray *existingObjectArray;
     if (uniqueKey) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ == %@",uniqueKey,[inputDict objectForKey:uniqueKey]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ == %@", uniqueKey, [inputDict objectForKey:uniqueKey]];
         existingObjectArray = [self arrayForClass:objectClass withPredicate:predicate forContext:contextOrNil];
         NSAssert([existingObjectArray count] < 2, @"UNIQUE IDENTIFIER IS NOT UNIQUE. MORE THAN ONE MATCHING OBJECT FOUND");
     }
