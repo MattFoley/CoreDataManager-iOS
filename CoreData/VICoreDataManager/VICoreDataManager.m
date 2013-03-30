@@ -46,7 +46,8 @@
 
 //private interface to VIManagedObjectMapper
 @interface VIManagedObjectMapper (setInformationFromDictionary)
-- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)managedObject;
+- (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object;
+- (NSDictionary *)dictionaryRepresentationOfManagedObject:(NSManagedObject *)object;
 @end
 
 @implementation VICoreDataManager
@@ -253,6 +254,13 @@
 {
     VIManagedObjectMapper *mapper = [self mapperForClass:[object class]];
     [mapper setInformationFromDictionary:inputDict forManagedObject:object];
+}
+
+#pragma mark - Convenient Output
+- (NSDictionary *)dictionaryRepresentationOfManagedObject:(NSManagedObject *)object
+{
+
+    return nil;
 }
 
 #pragma mark -Fetch and delete

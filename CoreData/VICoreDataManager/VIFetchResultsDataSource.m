@@ -36,9 +36,6 @@
         _batchSize = batchSize;
         _delegate = delegate;
 
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(reloadFetchedResults:)
-                                                     name:VICOREDATA_NOTIFICATION_ICLOUD_UPDATED object:nil];
         [self initFetchedResultsController];
     }
 
@@ -120,12 +117,6 @@
                    sortDescriptors:sortDescriptors
                 managedObjectClass:managedObjectClass
                          batchSize:20];
-}
-
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:VICOREDATA_NOTIFICATION_ICLOUD_UPDATED object:nil];
 }
 
 #pragma mark - Instance Methods

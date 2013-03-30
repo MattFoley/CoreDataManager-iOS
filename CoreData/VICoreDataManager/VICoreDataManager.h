@@ -14,8 +14,6 @@
 #import "VIManagedObject.h"
 #import "VIFetchResultsDataSource.h"
 
-FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
-
 @interface VICoreDataManager : NSObject
 
 //this constructor is explicitly a VICoreDataManager because it's not expected to be subclassed
@@ -45,6 +43,9 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict
                     forManagedObject:(NSManagedObject *)object;
+
+//Return the dictionary representation of a managed object
+- (NSDictionary *)dictionaryRepresentationOfManagedObject:(NSManagedObject *)object;
 
 //Fetch and delete NSManagedObject subclasses
 //NOT threadsafe! Always use a temp context if you are NOT on the main thread.

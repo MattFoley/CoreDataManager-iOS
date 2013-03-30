@@ -17,6 +17,11 @@
     }
 }
 
+- (NSDictionary *)dictionaryRepresentation
+{
+    return [[VICoreDataManager sharedInstance] dictionaryRepresentationOfManagedObject:self];
+}
+
 #pragma mark - Add Objects
 + (NSArray *)addWithArray:(NSArray *)inputArray forManagedObjectContext:(NSManagedObjectContext*)contextOrNil
 {
@@ -29,19 +34,19 @@
 }
 
 #pragma mark - Fetch with Object's Context
-+ (BOOL)existsForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
++ (BOOL)existsForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)object
 {
-    return [self existsForPredicate:predicate forManagedObjectContext:[managedObject managedObjectContext]];
+    return [self existsForPredicate:predicate forManagedObjectContext:[object managedObjectContext]];
 }
 
-+ (NSArray *)fetchAllForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
++ (NSArray *)fetchAllForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)object
 {
-    return [self fetchAllForPredicate:predicate forManagedObjectContext:[managedObject managedObjectContext]];
+    return [self fetchAllForPredicate:predicate forManagedObjectContext:[object managedObjectContext]];
 }
 
-+ (id)fetchForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)managedObject
++ (id)fetchForPredicate:(NSPredicate *)predicate forManagedObject:(NSManagedObject *)object
 {
-    return [self fetchForPredicate:predicate forManagedObjectContext:[managedObject managedObjectContext]];
+    return [self fetchForPredicate:predicate forManagedObjectContext:[object managedObjectContext]];
 }
 
 #pragma mark - Fetch with Context
