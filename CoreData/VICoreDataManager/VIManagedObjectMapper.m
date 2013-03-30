@@ -50,11 +50,10 @@
 - (id)checkDate:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter
 {
     id date = [dateFormatter dateFromString:inputObject];
-    if (date) {
-        return date;
+    if (!date) {
+        return inputObject;
     }
-
-    return inputObject;
+    return date;
 }
 
 - (BOOL)checkClass:(id)inputObject managedObject:(NSManagedObject *)managedObject key:(NSString *)key

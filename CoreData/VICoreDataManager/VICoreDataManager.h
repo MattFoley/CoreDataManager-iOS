@@ -18,6 +18,7 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 
 @interface VICoreDataManager : NSObject
 
+//this constructor is explicitly a VICoreDataManager because it's not expected to be subclassed
 + (VICoreDataManager *)sharedInstance;
 
 - (NSManagedObjectContext *)managedObjectContext;
