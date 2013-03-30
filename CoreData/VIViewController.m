@@ -56,10 +56,9 @@
 {
     [[VICoreDataManager sharedInstance] resetCoreData];
 
-    int i = 0;
-
     //MAKE 20 PEOPLE WITH THE DEFAULT MAPPER
-    while (i < 20 ) {
+    int i = 0;
+    while (i < 21 ) {
         NSLog(@"%@",[VIPerson addWithDictionary:[self makePersonDictForDefaultMapper] forManagedObjectContext:nil]);
         i++;
     }
@@ -78,10 +77,19 @@
     VIManagedObjectMapper *mapper = [VIManagedObjectMapper mapperWithUniqueKey:@"lastName" andMaps:maps];
     [[VICoreDataManager sharedInstance] setObjectMapper:mapper forClass:[VIPerson class]];
 
-    while (i < 20 ) {
+    int j = 0;
+    while (j < 21 ) {
         NSLog(@"%@",[VIPerson addWithDictionary:[self makePersonDictForCustomMapper] forManagedObjectContext:nil]);
-        i++;
+        j++;
     }
+
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"lovesCoolRanch == %@", @YES];
+    NSArray *allPeople = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+
+    [allPeople enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSDictionary *dict = [obj dictionaryRepresentation];
+        NSLog(@"%@",dict);
+    }];
 }
 
 - (NSString *)randomNumber
@@ -105,7 +113,7 @@
                            @"last" : [self randomNumber] ,
                            @"date_of_birth" : @"24 Jul 83 14:16",
                            @"cat_num" : @17,
-                           @"CR_PREF" : @NO};
+                           @"CR_PREF" : @YES};
     return dict;
 }
 
