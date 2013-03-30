@@ -44,7 +44,7 @@
 
 @end
 
-//private interface to VIManagedObjectMap
+//private interface to VIManagedObjectMapper
 @interface VIManagedObjectMapper (setInformationFromDictionary)
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)managedObject;
 @end

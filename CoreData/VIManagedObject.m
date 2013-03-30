@@ -53,8 +53,8 @@
 + (NSArray *)fetchAllForPredicate:(NSPredicate *)predicate forManagedObjectContext:(NSManagedObjectContext *)contextOrNil
 {
     NSArray *results = [[VICoreDataManager sharedInstance] arrayForClass:[self class]
-                                                        withPredicate:predicate
-                                                           forContext:contextOrNil];
+                                                           withPredicate:predicate
+                                                              forContext:contextOrNil];
     return results;
 }
 
