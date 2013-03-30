@@ -7,7 +7,8 @@
 #import "VICoreDataManager.h"
 
 @interface VIManagedObjectMapper()
-@property NSArray *mapsArray;
+@property (nonatomic) NSArray *mapsArray;
+- (void)updateForeignComparisonKey;
 - (id)checkNull:(id)inputObject;
 - (id)checkDate:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter;
 - (id)checkString:(id)outputObject withDateFormatter:(NSDateFormatter *)dateFormatter;
@@ -20,8 +21,8 @@
 + (instancetype)mapperWithUniqueKey:(NSString *)comparisonKey andMaps:(NSArray *)mapsArray;
 {
     VIManagedObjectMapper *mapper = [[self alloc] init];
-    [mapper setUniqueComparisonKey:comparisonKey];
     [mapper setMapsArray:mapsArray];
+    [mapper setUniqueComparisonKey:comparisonKey];
     return mapper;
 }
 
@@ -38,6 +39,32 @@
         _overwriteObjectsWithServerChanges = YES;
     }
     return self;
+}
+
+- (void)setUniqueComparisonKey:(NSString *)uniqueComparisonKey
+{
+    _uniqueComparisonKey = uniqueComparisonKey;
+    if (uniqueComparisonKey) {
+        [self updateForeignComparisonKey];
+    }
+}
+
+- (void)setMapsArray:(NSArray *)mapsArray
+{
+    _mapsArray = mapsArray;
+    if (mapsArray) {
+        [self updateForeignComparisonKey];
+    }
+}
+
+- (void)updateForeignComparisonKey
+{
+    [self.mapsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        VIManagedObjectMap *aMap = obj;
+        if ([aMap.coreDataKey isEqualToString:self.uniqueComparisonKey]) {
+            _foreignUniqueComparisonKey = aMap.inputKey;
+        }
+    }];
 }
 
 - (id)checkNull:(id)inputObject

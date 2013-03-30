@@ -10,7 +10,8 @@
 
 @interface VIManagedObjectMapper : NSObject
 
-@property NSString *uniqueComparisonKey;
+@property (nonatomic, readonly) NSString *uniqueComparisonKey;
+@property (nonatomic, readonly) NSString *foreignUniqueComparisonKey;
 @property BOOL deleteAllBeforeImport; //default is YES
 @property BOOL overwriteObjectsWithServerChanges; //default is YES
 

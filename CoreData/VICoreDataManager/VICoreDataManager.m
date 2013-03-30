@@ -30,7 +30,7 @@
 - (void)initManagedObjectContext;
 
 //Thread Safety with Main MOC
-- (NSManagedObjectContext *)threadSafeContext:(NSManagedObjectContext *)context;
+- (NSManagedObjectContext *)safeContext:(NSManagedObjectContext *)context;
 
 //Context Saving and Merging
 - (void)saveContext:(NSManagedObjectContext *)managedObjectContext;
@@ -226,14 +226,14 @@
 
 - (NSManagedObject *)importDictionary:(NSDictionary *)inputDict forClass:(Class)objectClass withContext:(NSManagedObjectContext *)contextOrNil
 {
-    contextOrNil = [self threadSafeContext:contextOrNil];
+    contextOrNil = [self safeContext:contextOrNil];
     
     VIManagedObjectMapper *mapper = [self mapperForClass:objectClass];
     NSString *uniqueKey = mapper.uniqueComparisonKey;
 
     NSArray *existingObjectArray;
     if (uniqueKey) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ == %@", uniqueKey, [inputDict objectForKey:uniqueKey]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", uniqueKey, [inputDict objectForKey:mapper.foreignUniqueComparisonKey]];
         existingObjectArray = [self arrayForClass:objectClass withPredicate:predicate forContext:contextOrNil];
         NSAssert([existingObjectArray count] < 2, @"UNIQUE IDENTIFIER IS NOT UNIQUE. MORE THAN ONE MATCHING OBJECT FOUND");
     }
@@ -275,7 +275,7 @@
 
 - (NSArray *)arrayForClass:(Class)managedObjectClass withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)contextOrNil
 {
-    contextOrNil = [self threadSafeContext:contextOrNil];
+    contextOrNil = [self safeContext:contextOrNil];
 
     NSString *entityName = NSStringFromClass(managedObjectClass);
 
@@ -298,7 +298,7 @@
 
 - (BOOL)deleteAllObjectsOfClass:(Class)managedObjectClass context:(NSManagedObjectContext *)contextOrNil
 {
-    contextOrNil = [self threadSafeContext:contextOrNil];
+    contextOrNil = [self safeContext:contextOrNil];
 
     NSString *entityName = NSStringFromClass(managedObjectClass);
 
@@ -316,7 +316,7 @@
 }
 
 #pragma mark - Thread Safety with Main MOC
-- (NSManagedObjectContext *)threadSafeContext:(NSManagedObjectContext *)context
+- (NSManagedObjectContext *)safeContext:(NSManagedObjectContext *)context
 {
     if (!context) {
         context = [self managedObjectContext];

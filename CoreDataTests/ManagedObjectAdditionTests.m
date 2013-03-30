@@ -47,7 +47,8 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
 
 - (void)testImportDictionaryWithCustomMapper
 {
-    [[VICoreDataManager sharedInstance] setObjectMapper:[self customMapper] forClass:[VIPerson class]];
+    VIManagedObjectMapper *mapper = [VIManagedObjectMapper mapperWithUniqueKey:nil andMaps:[self customMapsArray]];
+    [[VICoreDataManager sharedInstance] setObjectMapper:mapper forClass:[VIPerson class]];
     VIPerson *person = [VIPerson addWithDictionary:[self makePersonDictForCustomMapper] forManagedObjectContext:nil];
     [self checkCustomMappingForPerson:person];
 
@@ -62,7 +63,8 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
                        [self makePersonDictForCustomMapper],
                        [self makePersonDictForCustomMapper],
                        [self makePersonDictForCustomMapper]];
-    [[VICoreDataManager sharedInstance] setObjectMapper:[self customMapper] forClass:[VIPerson class]];
+    VIManagedObjectMapper *mapper = [VIManagedObjectMapper mapperWithUniqueKey:nil andMaps:[self customMapsArray]];
+    [[VICoreDataManager sharedInstance] setObjectMapper:mapper forClass:[VIPerson class]];
     NSArray *arrayOfPeople = [VIPerson addWithArray:array forManagedObjectContext:nil];
 
     STAssertTrue([arrayOfPeople count] == 5, @"person array has incorrect number of people");
@@ -86,7 +88,42 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
     [arrayOfPeople enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         [self checkDefaultMappingForPerson:obj];
     }];
+}
 
+- (void)testUniqueKeyCustomMapper
+{
+    VIManagedObjectMapper *mapper = [VIManagedObjectMapper mapperWithUniqueKey:LAST_NAME_DEFAULT_KEY andMaps:[self customMapsArray]];
+    [[VICoreDataManager sharedInstance] setObjectMapper:mapper forClass:[VIPerson class]];
+    
+    NSDictionary *dict1 = @{FIRST_NAME_CUSTOM_KEY : @"SOMEGUY",
+                            LAST_NAME_CUSTOM_KEY : @"GUY1",
+                            BIRTHDAY_CUSTOM_KEY : @"24 Jul 83 14:16",
+                            CATS_CUSTOM_KEY : @192,
+                            COOL_RANCH_CUSTOM_KEY : @YES};
+    [VIPerson addWithDictionary:dict1 forManagedObjectContext:nil];
+    
+    NSDictionary *dict2 = @{FIRST_NAME_CUSTOM_KEY : @"SOMEGUY",
+                            LAST_NAME_CUSTOM_KEY : @"GUY2",
+                            BIRTHDAY_CUSTOM_KEY : @"24 Jul 83 14:16",
+                            CATS_CUSTOM_KEY : @192,
+                            COOL_RANCH_CUSTOM_KEY : @YES};
+    [VIPerson addWithDictionary:dict2 forManagedObjectContext:nil];
+    
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"firstName == %@",  @"SOMEGUY"];
+    NSArray *array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+    STAssertTrue([array count] == 2, @"unique person test array has incorrect number of people");
+
+    NSDictionary *dict3 = @{FIRST_NAME_CUSTOM_KEY : @"ANOTHERGUY",
+                            LAST_NAME_CUSTOM_KEY : @"GUY1",
+                            BIRTHDAY_CUSTOM_KEY : @"18 Jul 83 14:16",
+                            CATS_CUSTOM_KEY : @14,
+                            COOL_RANCH_CUSTOM_KEY : @YES};
+    [VIPerson addWithDictionary:dict3 forManagedObjectContext:nil];
+
+    pred = [NSPredicate predicateWithFormat:@"lastName == %@",  @"GUY1"];
+    array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+    STAssertTrue([array count] == 1, @"unique key was not effective");
+    STAssertTrue([[array[0] numberOfCats] isEqualToNumber:@14], @"unique key was effective but the person object was not updated");
 }
 
 #pragma mark - Convenience stuff
@@ -151,14 +188,13 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
     return df;
 }
 
-- (VIManagedObjectMapper *)customMapper
+- (NSArray *)customMapsArray
 {
-    NSArray *maps = @[[VIManagedObjectMap mapWithInput:FIRST_NAME_CUSTOM_KEY output:FIRST_NAME_DEFAULT_KEY],
-                      [VIManagedObjectMap mapWithInput:LAST_NAME_CUSTOM_KEY output:LAST_NAME_DEFAULT_KEY],
-                      [VIManagedObjectMap mapWithInput:BIRTHDAY_CUSTOM_KEY output:BIRTHDAY_DEFAULT_KEY dateFormatter:[self customDateFormatter]],
-                      [VIManagedObjectMap mapWithInput:CATS_CUSTOM_KEY output:CATS_DEFAULT_KEY],
-                      [VIManagedObjectMap mapWithInput:COOL_RANCH_CUSTOM_KEY output:COOL_RANCH_DEFAULT_KEY]];
-    return [VIManagedObjectMapper mapperWithUniqueKey:nil andMaps:maps];
+    return @[[VIManagedObjectMap mapWithInput:FIRST_NAME_CUSTOM_KEY output:FIRST_NAME_DEFAULT_KEY],
+             [VIManagedObjectMap mapWithInput:LAST_NAME_CUSTOM_KEY output:LAST_NAME_DEFAULT_KEY],
+             [VIManagedObjectMap mapWithInput:BIRTHDAY_CUSTOM_KEY output:BIRTHDAY_DEFAULT_KEY dateFormatter:[self customDateFormatter]],
+             [VIManagedObjectMap mapWithInput:CATS_CUSTOM_KEY output:CATS_DEFAULT_KEY],
+             [VIManagedObjectMap mapWithInput:COOL_RANCH_CUSTOM_KEY output:COOL_RANCH_DEFAULT_KEY]];
 }
 
 @end

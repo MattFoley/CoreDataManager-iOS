@@ -52,7 +52,6 @@
 - (NSArray *)arrayForClass:(Class)managedObjectClass;
 - (NSArray *)arrayForClass:(Class)managedObjectClass
                 forContext:(NSManagedObjectContext *)contextOrNil;
-
 - (NSArray *)arrayForClass:(Class)managedObjectClass
              withPredicate:(NSPredicate *)predicate
                 forContext:(NSManagedObjectContext *)contextOrNil;
