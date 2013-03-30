@@ -43,10 +43,6 @@ NSString *const iCloudLogsDirectoryName = @"Logs";
 - (void)saveTempContext:(NSManagedObjectContext *)tempContext;
 - (void)tempContextSaved:(NSNotification *)notification;
 
-//iCloud Integration - DO NOT USE
-- (void)setupiCloudForPersistantStoreCoordinator:(NSPersistentStoreCoordinator *)psc;
-- (void)mergeChangesFromiCloud:(NSNotification *)notification;
-
 //Convenience Methods
 - (VIManagedObjectMapper *)mapperForClass:(Class)objectClass;
 - (NSURL *)applicationDocumentsDirectory;
@@ -401,95 +397,9 @@ static VICoreDataManager *_sharedObject = nil;
     return [self tempManagedObjectContext];
 }
 
-- (void)endTransactionForContext:(NSManagedObjectContext *)context
+- (void)saveAndMergeWithMainContext:(NSManagedObjectContext *)context
 {
     [self saveTempContext:context];
-}
-
-#pragma mark - iCloud Integration
-//THIS IS NOT CORRECT
-//TODO - MAKE THIS WORK
-- (void)setupiCloudForPersistantStoreCoordinator:(NSPersistentStoreCoordinator *)psc
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSURL *localStore = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:self.databaseFilename];
-
-    //http://developer.apple.com/library/ios/#documentation/Cocoa/Reference/Foundation/Classes/NSFileManager_Class/Reference/Reference.html#//apple_ref/occ/instm/NSFileManager/URLForUbiquityContainerIdentifier:
-    NSURL *iCloud = [fileManager URLForUbiquityContainerIdentifier:nil];
-
-    if (iCloud) {
-
-        NSLog(@"iCloud is working");
-
-        NSURL *iCloudLogsPath = [NSURL fileURLWithPath:[[iCloud path] stringByAppendingPathComponent:iCloudLogsDirectoryName]];
-
-        NSLog(@"iCloudEnabledAppID = %@", self.iCloudAppId);
-        NSLog(@"dataFileName = %@", self.databaseFilename);
-        NSLog(@"iCloudDataDirectoryName = %@", iCloudDataDirectoryName);
-        NSLog(@"iCloudLogsDirectoryName = %@", iCloudLogsDirectoryName);
-        NSLog(@"iCloud = %@", iCloud);
-        NSLog(@"iCloudLogsPath = %@", iCloudLogsPath);
-
-        if ([fileManager fileExistsAtPath:[[iCloud path] stringByAppendingPathComponent:iCloudDataDirectoryName]] == NO) {
-            NSError *fileSystemError;
-            [fileManager createDirectoryAtPath:[[iCloud path] stringByAppendingPathComponent:iCloudDataDirectoryName]
-                   withIntermediateDirectories:YES attributes:nil error:&fileSystemError];
-            if (fileSystemError != nil) {
-                NSLog(@"Error creating database directory %@", fileSystemError);
-            }
-        }
-
-        NSString *iCloudData = [[[iCloud path]
-                                 stringByAppendingPathComponent:iCloudDataDirectoryName]
-                                stringByAppendingPathComponent:self.databaseFilename];
-
-        NSLog(@"iCloudData = %@", iCloudData);
-
-        NSMutableDictionary *options = [NSMutableDictionary dictionary];
-        [options setObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
-        [options setObject:[NSNumber numberWithBool:YES] forKey:NSInferMappingModelAutomaticallyOption];
-        [options setObject:self.iCloudAppId forKey:NSPersistentStoreUbiquitousContentNameKey];
-        [options setObject:iCloudLogsPath forKey:NSPersistentStoreUbiquitousContentURLKey];
-
-        [psc lock];
-
-        [psc addPersistentStoreWithType:NSSQLiteStoreType
-                          configuration:nil URL:[NSURL fileURLWithPath:iCloudData]
-                                options:options
-                                  error:nil];
-
-        [psc unlock];
-    } else {
-        NSLog(@"iCloud is NOT working - using a local store");
-        NSMutableDictionary *options = [NSMutableDictionary dictionary];
-        [options setObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
-        [options setObject:[NSNumber numberWithBool:YES] forKey:NSInferMappingModelAutomaticallyOption];
-
-        [psc lock];
-
-        [psc addPersistentStoreWithType:NSSQLiteStoreType
-                          configuration:nil
-                                    URL:localStore
-                                options:options
-                                  error:nil];
-        [psc unlock];
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:VICOREDATA_NOTIFICATION_ICLOUD_UPDATED object:nil userInfo:nil];
-}
-
-- (void)mergeChangesFromiCloud:(NSNotification *)notification
-{
-    NSLog(@"Merging in changes from iCloud...");
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[self managedObjectContext] mergeChangesFromContextDidSaveNotification:notification];
-
-        NSNotification *refreshNotification = [NSNotification notificationWithName:VICOREDATA_NOTIFICATION_ICLOUD_UPDATED
-                                                                            object:self
-                                                                          userInfo:[notification userInfo]];
-        [[NSNotificationCenter defaultCenter] postNotification:refreshNotification];
-    });
 }
 
 #pragma mark - Convenience Methods
