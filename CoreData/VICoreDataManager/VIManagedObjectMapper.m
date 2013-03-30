@@ -10,6 +10,7 @@
 @property NSArray *mapsArray;
 - (id)checkNull:(id)inputObject;
 - (id)checkDate:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter;
+- (id)checkString:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter;
 - (BOOL)checkClass:(id)inputObject managedObject:(NSManagedObject *)object key:(NSString *)key;
 - (Class)expectedClassForObject:(NSManagedObject *)object andKey:(id)key;
 @end
@@ -56,6 +57,15 @@
     return date;
 }
 
+- (id)checkString:(id)inputObject withDateFormatter:(NSDateFormatter *)dateFormatter
+{
+    id dateString = [dateFormatter stringFromDate:inputObject];
+    if (!dateString) {
+        return inputObject;
+    }
+    return dateString;
+}
+
 - (BOOL)checkClass:(id)inputObject managedObject:(NSManagedObject *)object key:(NSString *)key
 {
     Class expectedClass = [self expectedClassForObject:object andKey:key];
@@ -75,18 +85,31 @@
 
 @end
 
-@implementation VIManagedObjectMapper (setInformationFromDictionary)
+@implementation VIManagedObjectMapper (dictionaryInputOutput)
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object
 {
     [self.mapsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        VIManagedObjectMap *map = obj;
-        id inputObject = [inputDict objectForKey:map.inputKey];
-        if ([self checkClass:inputObject managedObject:object key:map.coreDataKey]) {
+        VIManagedObjectMap *aMap = obj;
+        id inputObject = [inputDict objectForKey:aMap.inputKey];
+        if ([self checkClass:inputObject managedObject:object key:aMap.coreDataKey]) {
             inputObject = [self checkNull:inputObject];
-            inputObject = [self checkDate:inputObject withDateFormatter:map.dateFormatter];
-            [object safeSetValue:inputObject forKey:map.coreDataKey];
+            inputObject = [self checkDate:inputObject withDateFormatter:aMap.dateFormatter];
+            [object safeSetValue:inputObject forKey:aMap.coreDataKey];
         }
     }];
+}
+
+- (NSDictionary *)dictionaryRepresentationOfManagedObject:(NSManagedObject *)object
+{
+    NSMutableDictionary *outputDict = [NSMutableDictionary new];
+    [self.mapsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        VIManagedObjectMap *aMap = obj;
+        id outputObject = [object valueForKey:aMap.coreDataKey];
+        outputObject = [self checkString:outputObject withDateFormatter:aMap.dateFormatter];
+        [outputDict setObject:outputObject forKey:aMap.inputKey];
+    }];
+
+    return [outputDict copy];
 }
 @end
 
@@ -102,5 +125,17 @@
             [object safeSetValue:inputObject forKey:key];
         }
     }];
+}
+
+- (NSDictionary *)dictionaryRepresentationOfManagedObject:(NSManagedObject *)object
+{
+    NSDictionary *attributes = [[object entity] attributesByName];
+    NSMutableDictionary *outputDict = [NSMutableDictionary new];
+    [attributes enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        id outputObject = [object valueForKey:key];
+        [outputDict setObject:outputObject forKey:key];
+    }];
+
+    return [outputDict copy];
 }
 @end

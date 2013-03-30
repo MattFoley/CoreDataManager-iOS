@@ -45,7 +45,7 @@
 @end
 
 //private interface to VIManagedObjectMapper
-@interface VIManagedObjectMapper (setInformationFromDictionary)
+@interface VIManagedObjectMapper (dictionaryInputOutput)
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)object;
 - (NSDictionary *)dictionaryRepresentationOfManagedObject:(NSManagedObject *)object;
 @end
@@ -259,8 +259,7 @@
 #pragma mark - Convenient Output
 - (NSDictionary *)dictionaryRepresentationOfManagedObject:(NSManagedObject *)object
 {
-
-    return nil;
+    return [[self mapperForClass:[object class]] dictionaryRepresentationOfManagedObject:object];
 }
 
 #pragma mark -Fetch and delete
@@ -319,7 +318,7 @@
 #pragma mark - Thread Safety with Main MOC
 - (NSManagedObjectContext *)threadSafeContext:(NSManagedObjectContext *)context
 {
-    if (context == nil) {
+    if (!context) {
         context = [self managedObjectContext];
     }
 
@@ -419,4 +418,3 @@
 }
 
 @end
-
