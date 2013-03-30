@@ -47,8 +47,15 @@
 //Return the dictionary representation of a managed object
 - (NSDictionary *)dictionaryRepresentationOfManagedObject:(NSManagedObject *)object;
 
-//Fetch and delete NSManagedObject subclasses
+//Count, Fetch, and Delete NSManagedObject subclasses
 //NOT threadsafe! Always use a temp context if you are NOT on the main thread.
+- (NSUInteger)countForClass:(Class)managedObjectClass;
+- (NSUInteger)countForClass:(Class)managedObjectClass
+                 forContext:(NSManagedObjectContext *)contextOrNil;
+- (NSUInteger)countForClass:(Class)managedObjectClass
+              withPredicate:(NSPredicate *)predicate
+                 forContext:(NSManagedObjectContext *)contextOrNil;
+
 - (NSArray *)arrayForClass:(Class)managedObjectClass;
 - (NSArray *)arrayForClass:(Class)managedObjectClass
                 forContext:(NSManagedObjectContext *)contextOrNil;

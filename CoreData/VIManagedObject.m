@@ -52,22 +52,23 @@
 #pragma mark - Fetch with Context
 + (BOOL)existsForPredicate:(NSPredicate *)predicate forManagedObjectContext:(NSManagedObjectContext *)contextOrNil
 {
-    return [self fetchAllForPredicate:predicate forManagedObjectContext:contextOrNil] != nil;
+    return [[VICoreDataManager sharedInstance] countForClass:[self class]
+                                               withPredicate:predicate
+                                                  forContext:contextOrNil];;
 }
 
 + (NSArray *)fetchAllForPredicate:(NSPredicate *)predicate forManagedObjectContext:(NSManagedObjectContext *)contextOrNil
 {
-    NSArray *results = [[VICoreDataManager sharedInstance] arrayForClass:[self class]
-                                                           withPredicate:predicate
-                                                              forContext:contextOrNil];
-    return results;
+    return [[VICoreDataManager sharedInstance] arrayForClass:[self class]
+                                               withPredicate:predicate
+                                                  forContext:contextOrNil];
 }
 
 + (id)fetchForPredicate:(NSPredicate *)predicate forManagedObjectContext:(NSManagedObjectContext *)contextOrNil
 {
     NSArray *results = [self fetchAllForPredicate:predicate forManagedObjectContext:contextOrNil];
 
-    if ([results count] > 0) {
+    if ([results count]) {
         return [results lastObject];
     }
 

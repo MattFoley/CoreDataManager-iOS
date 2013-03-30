@@ -19,16 +19,11 @@ NSString *const BIRTHDAY_CUSTOM_KEY = @"date_of_birth";
 NSString *const CATS_CUSTOM_KEY = @"cat_num";
 NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
 
-//use this interface for publicizing private methods for testing
-@interface VICoreDataManager(privateTests)
-- (void)setResource:(NSString *)resource database:(NSString *)database forBundleIdentifier:(NSString *)bundleIdentifier;
-@end
-
 @implementation ManagedObjectAdditionTests
 
 - (void)setUp
 {
-    [[VICoreDataManager sharedInstance] setResource:@"VICoreDataModel" database:@"VICoreDataModel.sqlite"];
+    [[VICoreDataManager sharedInstance] setResource:@"VICoreDataModel" database:@"VICoreDataTestingModel.sqlite"];
 }
 
 - (void)tearDown
@@ -110,7 +105,7 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
     [VIPerson addWithDictionary:dict2 forManagedObjectContext:nil];
     
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"firstName == %@",  @"SOMEGUY"];
-    NSArray *array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+    NSArray *array = [VIPerson fetchAllForPredicate:pred forManagedObjectContext:nil];
     STAssertTrue([array count] == 2, @"unique person test array has incorrect number of people");
 
     NSDictionary *dict3 = @{FIRST_NAME_CUSTOM_KEY : @"ANOTHERGUY",
@@ -121,7 +116,7 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
     [VIPerson addWithDictionary:dict3 forManagedObjectContext:nil];
 
     pred = [NSPredicate predicateWithFormat:@"lastName == %@",  @"GUY1"];
-    array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+    array = [VIPerson fetchAllForPredicate:pred forManagedObjectContext:nil];
     STAssertTrue([array count] == 1, @"unique key was not effective");
     STAssertTrue([[array[0] numberOfCats] isEqualToNumber:@14], @"unique key was effective but the person object was not updated");
 
@@ -134,7 +129,7 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
     [VIPerson addWithDictionary:dict4 forManagedObjectContext:nil];
 
     pred = [NSPredicate predicateWithFormat:@"lastName == %@",  @"GUY1"];
-    array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+    array = [VIPerson fetchAllForPredicate:pred forManagedObjectContext:nil];
     STAssertTrue([array count] == 1, @"unique key was not effective");
     STAssertTrue([[array[0] numberOfCats] isEqualToNumber:@14], @"\"overwriteObjectsWithServerChanges = NO\" was ignored");
 
@@ -147,7 +142,7 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
     [VIPerson addWithDictionary:dict5 forManagedObjectContext:nil];
 
     pred = [NSPredicate predicateWithFormat:@"lastName == %@",  @"GUY1"];
-    array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+    array = [VIPerson fetchAllForPredicate:pred forManagedObjectContext:nil];
     STAssertTrue([array count] == 1, @"unique key was not effective");
     STAssertTrue([[array[0] numberOfCats] isEqualToNumber:@777], @"\"overwriteObjectsWithServerChanges = NO\" was ignored");
 }

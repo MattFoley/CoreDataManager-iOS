@@ -13,10 +13,7 @@
 
 @property NSString *resource;
 @property NSString *databaseFilename;
-@property NSString *bundleIdentifier;
 @property NSMutableDictionary *mapperCollection;
-
-- (NSBundle *)bundle;
 
 //Getters
 - (NSManagedObjectContext *)tempManagedObjectContext;
@@ -38,9 +35,9 @@
 - (void)tempContextSaved:(NSNotification *)notification;
 
 //Convenience Methods
+- (NSFetchRequest *)fetchRequestWithClass:(Class)managedObjectClass predicate:(NSPredicate *)predicate;
 - (VIManagedObjectMapper *)mapperForClass:(Class)objectClass;
 - (NSURL *)applicationDocumentsDirectory;
-- (void)debugPersistentStore;
 
 @end
 
@@ -79,30 +76,8 @@
 
 - (void)setResource:(NSString *)resource database:(NSString *)database
 {
-    [self setResource:resource database:database forBundleIdentifier:nil];
-}
-
-- (void)setResource:(NSString *)resource database:(NSString *)database forBundleIdentifier:(NSString *)bundleIdentifier
-{
-    //this method is publicized in unit tests
     self.resource = resource;
     self.databaseFilename = database;
-    self.bundleIdentifier = bundleIdentifier;
-}
-
-- (NSBundle *)bundle
-{
-    // try your manually set bundle
-    NSBundle *bundle = [NSBundle bundleWithIdentifier:self.bundleIdentifier];
-
-    //default to main bundle
-    if (!bundle) {
-        bundle = [NSBundle mainBundle];
-    }
-
-    NSAssert(bundle, @"Missing bundle. Check the Bundle identifier on the plist of this target vs the identifiers array in this class.");
-
-    return bundle;
 }
 
 #pragma mark - Getters
@@ -152,7 +127,7 @@
 #pragma mark - Initializers
 - (void)initManagedObjectModel
 {
-    NSURL *modelURL = [[self bundle] URLForResource:_resource withExtension:@"momd"];
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:self.resource withExtension:@"momd"];
     _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
 }
 
@@ -264,7 +239,31 @@
     return [[self mapperForClass:[object class]] dictionaryRepresentationOfManagedObject:object];
 }
 
-#pragma mark -Fetch and delete
+#pragma mark - Count, Fetch, and Delete
+- (NSUInteger)countForClass:(Class)managedObjectClass
+{
+    return [self countForClass:managedObjectClass forContext:nil];
+}
+
+- (NSUInteger)countForClass:(Class)managedObjectClass forContext:(NSManagedObjectContext *)contextOrNil
+{
+    return [self countForClass:managedObjectClass withPredicate:nil forContext:contextOrNil];
+}
+
+- (NSUInteger)countForClass:(Class)managedObjectClass withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)contextOrNil
+{
+    contextOrNil = [self safeContext:contextOrNil];
+    NSFetchRequest *fetchRequest = [self fetchRequestWithClass:managedObjectClass predicate:predicate];
+
+    NSError *error;
+    NSUInteger count = [contextOrNil countForFetchRequest:fetchRequest error:&error];
+    if (error) {
+        NSLog(@"%s Fetch Request Error\n%@",__PRETTY_FUNCTION__ ,[error localizedDescription]);
+    }
+
+    return count;
+}
+
 - (NSArray *)arrayForClass:(Class)managedObjectClass
 {
     return [self arrayForClass:managedObjectClass forContext:nil];
@@ -278,16 +277,12 @@
 - (NSArray *)arrayForClass:(Class)managedObjectClass withPredicate:(NSPredicate *)predicate forContext:(NSManagedObjectContext *)contextOrNil
 {
     contextOrNil = [self safeContext:contextOrNil];
-
-    NSString *entityName = NSStringFromClass(managedObjectClass);
-
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:entityName];
-    [fetchRequest setPredicate:predicate];
+    NSFetchRequest *fetchRequest = [self fetchRequestWithClass:managedObjectClass predicate:predicate];
 
     NSError *error;
     NSArray *results = [contextOrNil executeFetchRequest:fetchRequest error:&error];
     if (error) {
-        NSLog(@"Fetch Request Error\n%@",[error localizedDescription]);
+        NSLog(@"%s Fetch Request Error\n%@",__PRETTY_FUNCTION__ ,[error localizedDescription]);
     }
 
     return results;
@@ -301,14 +296,14 @@
 - (BOOL)deleteAllObjectsOfClass:(Class)managedObjectClass context:(NSManagedObjectContext *)contextOrNil
 {
     contextOrNil = [self safeContext:contextOrNil];
-
-    NSString *entityName = NSStringFromClass(managedObjectClass);
-
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:entityName];
+    NSFetchRequest *fetchRequest = [self fetchRequestWithClass:managedObjectClass predicate:nil];
     [fetchRequest setIncludesPropertyValues:NO];
 
     NSError *error;
     NSArray *results = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&error];
+    if (error) {
+        NSLog(@"%s Fetch Request Error\n%@",__PRETTY_FUNCTION__ ,[error localizedDescription]);
+    }
 
     [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         [contextOrNil deleteObject:obj];
@@ -385,6 +380,14 @@
 }
 
 #pragma mark - Convenience Methods
+- (NSFetchRequest *)fetchRequestWithClass:(Class)managedObjectClass predicate:(NSPredicate *)predicate
+{
+    NSString *entityName = NSStringFromClass(managedObjectClass);
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
+    [fetchRequest setPredicate:predicate];
+    return fetchRequest;
+}
+
 - (VIManagedObjectMapper *)mapperForClass:(Class)objectClass
 {
     VIManagedObjectMapper *mapper = [self.mapperCollection objectForKey:NSStringFromClass(objectClass)];
@@ -413,11 +416,6 @@
     _managedObjectContext = nil;
     _managedObjectModel = nil;
     [_mapperCollection removeAllObjects];
-}
-
-- (void)debugPersistentStore
-{
-    NSLog(@"%@", [[_persistentStoreCoordinator managedObjectModel] entitiesByName]);
 }
 
 @end
