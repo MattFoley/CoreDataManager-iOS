@@ -29,8 +29,8 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 
 //Create and configure new NSManagedObject subclasses
 //If contextOrNil is nil the main context will be used.
-- (NSManagedObject *)addObjectForClass:(Class)managedObjectClass
-                            forContext:(NSManagedObjectContext *)contextOrNil;
+- (NSManagedObject *)objectForClass:(Class)managedObjectClass
+                            inContext:(NSManagedObjectContext *)contextOrNil;
 
 - (BOOL)setObjectMapper:(VIManagedObjectMapper *)objMap
                forClass:(Class)objectClass;

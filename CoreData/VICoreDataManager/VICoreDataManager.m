@@ -64,7 +64,6 @@
     dispatch_once(&pred,^{
         _sharedObject = [[self alloc] init];
     });
-
     return _sharedObject;
 }
 
@@ -149,7 +148,6 @@
     return _persistentStoreCoordinator;
 }
 
-
 #pragma mark - Initializers
 - (void)initManagedObjectModel
 {
@@ -191,7 +189,7 @@
 }
 
 #pragma mark - Create and configure
-- (NSManagedObject *)addObjectForClass:(Class)managedObjectClass forContext:(NSManagedObjectContext *)contextOrNil
+- (NSManagedObject *)objectForClass:(Class)managedObjectClass inContext:(NSManagedObjectContext *)contextOrNil
 {
     return [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(managedObjectClass) inManagedObjectContext:contextOrNil];
 }
@@ -244,7 +242,7 @@
         returnObject = existingObjectArray[0];
         [self setInformationFromDictionary:inputDict forManagedObject:returnObject];
     } else {
-        returnObject = [self addObjectForClass:objectClass forContext:contextOrNil];
+        returnObject = [self objectForClass:objectClass inContext:contextOrNil];
         [self setInformationFromDictionary:inputDict forManagedObject:returnObject];
     }
 
@@ -256,8 +254,6 @@
     VIManagedObjectMapper *mapper = [self mapperForClass:[object class]];
     [mapper setInformationFromDictionary:inputDict forManagedObject:object];
 }
-
-
 
 #pragma mark -Fetch and delete
 - (NSArray *)arrayForClass:(Class)managedObjectClass
