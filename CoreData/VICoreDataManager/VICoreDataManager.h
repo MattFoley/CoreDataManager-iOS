@@ -50,7 +50,7 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
                     forManagedObject:(NSManagedObject *)object;
 
 //Fetch and delete NSManagedObject subclasses
-//NOT threadsafe! Be sure to use a temp context if you are NOT on the main thread.
+//NOT threadsafe! Always use a temp context if you are NOT on the main thread.
 - (NSArray *)arrayForClass:(Class)managedObjectClass;
 - (NSArray *)arrayForClass:(Class)managedObjectClass
                 forContext:(NSManagedObjectContext *)contextOrNil;
@@ -67,8 +67,9 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 - (void)saveMainContext;
 
 //wrap your background transactions in these methods
-- (NSManagedObjectContext *)startTransaction;
-- (void)endTransactionForContext:(NSManagedObjectContext *)context;
+//you are responsible for retaining temp contexts yourself
+- (NSManagedObjectContext *)temporaryContext;
+- (void)saveAndMergeWithMainContext:(NSManagedObjectContext *)context;
 
 //this deletes the persistent stores and resets the main context and model to nil
 - (void)resetCoreData;
