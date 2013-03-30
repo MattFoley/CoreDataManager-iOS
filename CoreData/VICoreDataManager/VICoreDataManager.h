@@ -23,7 +23,7 @@ FOUNDATION_EXTERN NSString *const VICOREDATA_NOTIFICATION_ICLOUD_UPDATED;
 
 - (NSManagedObjectContext *)managedObjectContext;
 
-//be sure to use one of these setup methods before interacting with Core Data
+//use one of these setup methods before interacting with Core Data
 - (void)setResource:(NSString *)resource
            database:(NSString *)database;
 
