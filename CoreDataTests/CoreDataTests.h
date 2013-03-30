@@ -13,9 +13,4 @@
 
 @interface CoreDataTests : SenTestCase
 
-@property (nonatomic, strong) VIAppDelegate *appDelegate;
-@property (nonatomic, strong) NSArray *sortDescriptors;
-
-@property (nonatomic, retain) NSPredicate *predicate;
-@property (nonatomic, strong) VITestControllerDelegate *viewController;
 @end
