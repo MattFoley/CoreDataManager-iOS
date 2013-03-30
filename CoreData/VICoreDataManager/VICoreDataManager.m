@@ -239,9 +239,11 @@
     }
 
     NSManagedObject *returnObject;
-    if ([existingObjectArray count] && mapper.overwriteObjectsWithServerChanges) {
+    if ([existingObjectArray count]) {
         returnObject = existingObjectArray[0];
-        [self setInformationFromDictionary:inputDict forManagedObject:returnObject];
+        if (mapper.overwriteObjectsWithServerChanges) {
+            [self setInformationFromDictionary:inputDict forManagedObject:returnObject];
+        }
     } else {
         returnObject = [self objectForClass:objectClass inContext:contextOrNil];
         [self setInformationFromDictionary:inputDict forManagedObject:returnObject];

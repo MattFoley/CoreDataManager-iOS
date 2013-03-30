@@ -90,7 +90,7 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
     }];
 }
 
-- (void)testUniqueKeyCustomMapper
+- (void)testCustomMapperUniqueKeyAndOverwriteSetting
 {
     VIManagedObjectMapper *mapper = [VIManagedObjectMapper mapperWithUniqueKey:LAST_NAME_DEFAULT_KEY andMaps:[self customMapsArray]];
     [[VICoreDataManager sharedInstance] setObjectMapper:mapper forClass:[VIPerson class]];
@@ -124,6 +124,32 @@ NSString *const COOL_RANCH_CUSTOM_KEY = @"CR_PREF";
     array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
     STAssertTrue([array count] == 1, @"unique key was not effective");
     STAssertTrue([[array[0] numberOfCats] isEqualToNumber:@14], @"unique key was effective but the person object was not updated");
+
+    mapper.overwriteObjectsWithServerChanges = NO;
+    NSDictionary *dict4 = @{FIRST_NAME_CUSTOM_KEY : @"ONE MORE GUY",
+                            LAST_NAME_CUSTOM_KEY : @"GUY1",
+                            BIRTHDAY_CUSTOM_KEY : @"18 Jul 83 14:16",
+                            CATS_CUSTOM_KEY : @777,
+                            COOL_RANCH_CUSTOM_KEY : @NO};
+    [VIPerson addWithDictionary:dict4 forManagedObjectContext:nil];
+
+    pred = [NSPredicate predicateWithFormat:@"lastName == %@",  @"GUY1"];
+    array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+    STAssertTrue([array count] == 1, @"unique key was not effective");
+    STAssertTrue([[array[0] numberOfCats] isEqualToNumber:@14], @"\"overwriteObjectsWithServerChanges = NO\" was ignored");
+
+    mapper.overwriteObjectsWithServerChanges = YES;
+    NSDictionary *dict5 = @{FIRST_NAME_CUSTOM_KEY : @"ONE MORE GUY",
+                            LAST_NAME_CUSTOM_KEY : @"GUY1",
+                            BIRTHDAY_CUSTOM_KEY : @"18 Jul 83 14:16",
+                            CATS_CUSTOM_KEY : @777,
+                            COOL_RANCH_CUSTOM_KEY : @NO};
+    [VIPerson addWithDictionary:dict5 forManagedObjectContext:nil];
+
+    pred = [NSPredicate predicateWithFormat:@"lastName == %@",  @"GUY1"];
+    array = [VIPerson fetchAllForPredicate:pred forManagedObject:nil];
+    STAssertTrue([array count] == 1, @"unique key was not effective");
+    STAssertTrue([[array[0] numberOfCats] isEqualToNumber:@777], @"\"overwriteObjectsWithServerChanges = NO\" was ignored");
 }
 
 #pragma mark - Convenience stuff
