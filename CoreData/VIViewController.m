@@ -17,10 +17,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    [self setupDataSource];
-    
+
     [self initializeCoreData];
+
+    [self setupDataSource];
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                                            target:self
@@ -44,7 +44,7 @@
             [NSSortDescriptor sortDescriptorWithKey:@"lastName" ascending:YES],
             [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES], nil];
 
-    self.dataSource = [[VIPersonDataSource alloc] initWithPredicate:nil cacheName:nil tableView:self.tableView
+    self.dataSource = [[VIPersonDataSource alloc]initWithPredicate:nil cacheName:nil tableView:self.tableView
                                                  sectionNameKeyPath:nil sortDescriptors:sortDescriptors
                                                  managedObjectClass:[VIPerson class]];
 }
@@ -57,21 +57,22 @@
 {
     [[VICoreDataManager sharedInstance] resetCoreData];
 
-    id thing = [VIPerson addWithDictionary:[self makePersonDict] forManagedObjectContext:nil];
-    NSLog(@"here's the thing %@",thing);
+    int i = 0;
+    while (i < 50 ) {
+        id thing = [VIPerson addWithDictionary:[self makePersonDict] forManagedObjectContext:nil];
+        NSLog(@"here's the thing %@",thing);
+        ++i;
+    }
 }
 
 - (NSDictionary *)makePersonDict
 {
-    NSDictionary *spoutDict = @{@"firstName" : @"Lisa" ,
-                                @"lastName" : @"Frank" };
-
-    NSDictionary *teamDict = @{@"teamName" : @"Sponges" };
-
-    NSDictionary *dict = @{@"firstName" : @"Bob" ,
-                           @"lastName" : @"Frank" ,
-                           @"team" : teamDict ,
-                           @"spouse" : spoutDict };
+    int fVoid = arc4random()%3000;
+    NSString *fName = [NSString stringWithFormat:@"%d",fVoid];
+    int lVoid = arc4random()%3000;
+    NSString *lName = [NSString stringWithFormat:@"%d",lVoid];
+    NSDictionary *dict = @{@"firstName" : fName ,
+                           @"lastName" : lName };
     return dict;
 }
 
