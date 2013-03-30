@@ -13,7 +13,7 @@
 
 //If contextOrNil is nil the main context will be used.
 + (NSArray *)addWithArray:(NSArray *)inputArray forManagedObjectContext:(NSManagedObjectContext*)contextOrNil;
-+ (NSManagedObject *)addWithDictionary:(NSDictionary *)inputDict forManagedObjectContext:(NSManagedObjectContext*)contextOrNil;
++ (instancetype)addWithDictionary:(NSDictionary *)inputDict forManagedObjectContext:(NSManagedObjectContext*)contextOrNil;
 
 
 //These will adhere to the NSManagedObjectContext of the managedObject.

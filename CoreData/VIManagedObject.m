@@ -28,7 +28,7 @@
     return [[VICoreDataManager sharedInstance] importArray:inputArray forClass:[self class] withContext:contextOrNil];
 }
 
-+ (NSManagedObject *)addWithDictionary:(NSDictionary *)inputDict forManagedObjectContext:(NSManagedObjectContext*)contextOrNil
++ (instancetype)addWithDictionary:(NSDictionary *)inputDict forManagedObjectContext:(NSManagedObjectContext*)contextOrNil
 {
     return [[VICoreDataManager sharedInstance] importDictionary:inputDict forClass:[self class] withContext:contextOrNil];
 }

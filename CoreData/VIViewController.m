@@ -16,14 +16,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    [self initializeCoreData];
-
-    [self setupDataSource];
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                                                           target:self
-                                                                                           action:@selector(reloadData)];
+//
+//    [self initializeCoreData];
+//
+//    [self setupDataSource];
+//    
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+//                                                                                           target:self
+//                                                                                           action:@selector(reloadData)];
 }
 
 - (void)viewDidUnload

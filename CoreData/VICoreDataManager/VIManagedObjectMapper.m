@@ -139,6 +139,7 @@
     NSMutableDictionary *outputDict = [NSMutableDictionary new];
     [attributes enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         id outputObject = [object valueForKey:key];
+        outputObject = [self checkString:outputObject withDateFormatter:[VIManagedObjectMap defaultDateFormatter]];
         [outputDict setObject:outputObject forKey:key];
     }];
 

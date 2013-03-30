@@ -410,6 +410,7 @@
     _persistentStoreCoordinator = nil;
     _managedObjectContext = nil;
     _managedObjectModel = nil;
+    [_mapperCollection removeAllObjects];
 }
 
 - (void)debugPersistentStore
