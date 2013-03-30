@@ -49,8 +49,6 @@
 - (void)setInformationFromDictionary:(NSDictionary *)inputDict forManagedObject:(NSManagedObject *)managedObject;
 @end
 
-static VICoreDataManager *_sharedObject = nil;
-
 @implementation VICoreDataManager
 
 + (void)initialize
@@ -61,6 +59,7 @@ static VICoreDataManager *_sharedObject = nil;
 
 + (VICoreDataManager *)sharedInstance
 {
+    static VICoreDataManager *_sharedObject;
     static dispatch_once_t pred;
     dispatch_once(&pred,^{
         _sharedObject = [[self alloc] init];
