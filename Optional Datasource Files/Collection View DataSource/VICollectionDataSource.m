@@ -108,7 +108,7 @@
         abort();
     }
     //FOR REVIEW controllerWillChangeContent is not being called in tests - this updates the table explicitly
-    [_collectionView reloadData];
+    [_collectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
@@ -218,7 +218,7 @@
             // http://stackoverflow.com/questions/12611292/uicollectionview-assertion-failure
             // This code should be removed once the bug has been fixed, it is tracked in OpenRadar
             // http://openradar.appspot.com/12954582
-            [self.collectionView reloadData];
+            [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
             
         } else {
             
