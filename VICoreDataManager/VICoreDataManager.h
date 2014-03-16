@@ -20,10 +20,9 @@
 
 #import "VIManagedObjectMapper.h"
 #import "VIManagedObject.h"
-#import "VIFetchResultsDataSource.h"
 
 /**
- *  <#Description#>
+ *  Migration Options
  */
 typedef NS_OPTIONS (NSInteger, VIMigrationFailureOptions)
 {

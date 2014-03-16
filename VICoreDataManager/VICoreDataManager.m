@@ -166,11 +166,15 @@ VICoreDataManager *VI_SharedObject;
                                                            error:&error])
     {
         if (self.migrationFailureOptions == kMigrationFailureOptionWipeRecoveryAndAlert) {
+#if TARGET_OS_MAC
+            [[NSAlert alertWithMessageText:@"Migration Failed" defaultButton:@"Okay" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Migration has failed, data will be erased to ensure application stability.", nil] runModal];
+#else
             [[[UIAlertView alloc] initWithTitle:@"Migration Failed"
                                         message:@"Migration has failed, data will be erased to ensure application stability."
                                        delegate:nil
-                              cancelButtonTitle:@""
+                              cancelButtonTitle:@"Okay"
                               otherButtonTitles:nil] show];
+#endif
         }
         
         if (self.migrationFailureOptions == kMigrationFailureOptionWipeRecoveryAndAlert ||
