@@ -511,7 +511,20 @@ VICoreDataManager *VI_SharedObject;
 
 - (NSURL *)applicationLibraryDirectory
 {
+#if TARGET_OS_MAC
+    NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject;
+    NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+    path = [path stringByAppendingPathComponent:appName];
+    NSURL *retPath = [NSURL fileURLWithPath:path];
+    NSError *err;
+    [[NSFileManager defaultManager] createDirectoryAtURL:retPath withIntermediateDirectories:YES attributes:nil error:&err];
+    if (err) {
+        NSLog(@"%@", err);
+    }
+    return retPath;
+#else
     return [[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject];
+#endif
 }
 
 - (void)resetCoreData
