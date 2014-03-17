@@ -517,9 +517,8 @@ VICoreDataManager *VI_SharedObject;
     path = [path stringByAppendingPathComponent:appName];
     NSURL *retPath = [NSURL fileURLWithPath:path];
     NSError *err;
-    [[NSFileManager defaultManager] createDirectoryAtURL:retPath withIntermediateDirectories:YES attributes:nil error:&err];
-    if (err) {
-        NSLog(@"%@", err);
+    if (![[NSFileManager defaultManager] fileExistsAtPath:retPath.absoluteString]) {
+        [[NSFileManager defaultManager] createDirectoryAtURL:retPath withIntermediateDirectories:YES attributes:nil error:&err];
     }
     return retPath;
 #else
