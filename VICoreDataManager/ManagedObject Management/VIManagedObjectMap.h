@@ -7,10 +7,10 @@
 
 @interface VIManagedObjectMap : NSObject
 
-@property NSString *inputKeyPath;
-@property NSString *coreDataKey;
-@property (nonatomic) NSDateFormatter *dateFormatter;
-@property (nonatomic) NSNumberFormatter *numberFormatter;
+@property (strong) NSString *inputKeyPath;
+@property (strong) NSString *coreDataKey;
+@property (strong, nonatomic) NSDateFormatter *dateFormatter;
+@property (strong, nonatomic) NSNumberFormatter *numberFormatter;
 
 /**
  Provides easy access to rfc3339 date formatter, like "1985-04-12T23:20:50.52Z"
