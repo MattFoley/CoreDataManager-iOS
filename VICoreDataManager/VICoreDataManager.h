@@ -22,9 +22,6 @@
 #import "VIManagedObject.h"
 #import "VIFetchResultsDataSource.h"
 
-/**
- *  <#Description#>
- */
 typedef NS_OPTIONS (NSInteger, VIMigrationFailureOptions)
 {
     /**
@@ -69,6 +66,20 @@ typedef NS_OPTIONS (NSInteger, VIMigrationFailureOptions)
  */
 - (void)setResource:(NSString *)resource
            database:(NSString *)database;
+
+
+/**
+ Set the name of the managed object model, the name of the SQL lite store on disk, and specify an App group within to share this datamodel.
+ @param resource
+ The filename of the mom or momd file in your project
+ @param database
+ The filename of the SQLite store in your application. A nil database name will create an in-memory store.
+ @param appGroup
+ Providing this will write the database to the secured store for this App Group, allowing you to share the database with all members of the group automatically.
+ */
+- (void)setResource:(NSString *)resource 
+           database:(NSString *)database
+           appGroup:(NSString *)appGroup;
 
 /**
  Create a new instance of a given NSManagedObject subclass.

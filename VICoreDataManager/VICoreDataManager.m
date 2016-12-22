@@ -11,6 +11,7 @@
     NSPersistentStoreCoordinator *_persistentStoreCoordinator;
 }
 
+@property (copy) NSString *appGroup;
 @property (copy) NSString *resource;
 @property (copy) NSString *databaseFilename;
 @property NSMutableDictionary *mapperCollection;
@@ -37,7 +38,7 @@
 //Convenience Methods
 - (NSFetchRequest *)fetchRequestWithClass:(Class)managedObjectClass predicate:(NSPredicate *)predicate;
 - (VIManagedObjectMapper *)mapperForClass:(Class)objectClass;
-- (NSURL *)applicationLibraryDirectory;
+- (NSURL *)databaseDirectory;
 
 @end
 
@@ -81,8 +82,19 @@ VICoreDataManager *VI_SharedObject;
 
 - (void)setResource:(NSString *)resource database:(NSString *)database
 {
+    [self setResource:resource 
+             database:database
+             appGroup:nil];
+}
+
+
+- (void)setResource:(NSString *)resource
+           database:(NSString *)database
+           appGroup:(NSString *)appGroup
+{
     self.resource = resource;
     self.databaseFilename = database;
+    self.appGroup = appGroup;
     
     [self initPersistentStoreCoordinator];
 }
@@ -154,7 +166,7 @@ VICoreDataManager *VI_SharedObject;
     NSURL *storeURL;
     NSString *storeType = NSInMemoryStoreType;
     if (self.databaseFilename) {
-        storeURL = [[self applicationLibraryDirectory] URLByAppendingPathComponent:self.databaseFilename];
+        storeURL = [[self databaseDirectory] URLByAppendingPathComponent:self.databaseFilename];
         storeType = NSSQLiteStoreType;
     }
     
@@ -505,9 +517,21 @@ VICoreDataManager *VI_SharedObject;
     return mapper;
 }
 
-- (NSURL *)applicationLibraryDirectory
+- (NSURL *)databaseDirectory
 {
-    return [[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject];
+    if (self.appGroup) {
+        NSURL *groupPath = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:self.appGroup];
+        NSAssert(groupPath, @"Group path is nil, your app is likely not entitled for this container");
+        groupPath = [groupPath URLByAppendingPathComponent:@"core_data_manager"];
+
+        if (![[NSFileManager defaultManager] fileExistsAtPath:groupPath isDirectory:YES]) {
+            [[NSFileManager defaultManager] createDirectoryAtPath:groupPath withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+        
+        return groupPath;
+    } else {
+        return [[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject];
+    }
 }
 
 - (void)resetCoreData
