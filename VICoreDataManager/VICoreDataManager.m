@@ -5,6 +5,11 @@
 
 #import "VICoreDataManager.h"
 
+#ifdef SW_MESSAGES
+    #import "CrawlMessagesKeyboardView.h"
+    #import "UIAlertController+Blocks.h"
+#endif
+
 @interface VICoreDataManager () {
     NSManagedObjectContext *_managedObjectContext;
     NSManagedObjectModel *_managedObjectModel;
@@ -178,11 +183,21 @@ VICoreDataManager *VI_SharedObject;
                                                            error:&error])
     {
         if (self.migrationFailureOptions == kMigrationFailureOptionWipeRecoveryAndAlert) {
+#ifdef SW_MESSAGES
+            [UIAlertController showAlertInViewController:[CrawlMessagesKeyboardView rootController]
+                                               withTitle:@"Migration Failed"
+                                                 message:@"Migration has failed, data will be erased to ensure application stability."
+                                       cancelButtonTitle:@"Okay"
+                                  destructiveButtonTitle:nil
+                                       otherButtonTitles:nil
+                                                tapBlock:nil];
+#else
             [[[UIAlertView alloc] initWithTitle:@"Migration Failed"
                                         message:@"Migration has failed, data will be erased to ensure application stability."
                                        delegate:nil
                               cancelButtonTitle:@""
                               otherButtonTitles:nil] show];
+#endif
         }
         
         if (self.migrationFailureOptions == kMigrationFailureOptionWipeRecoveryAndAlert ||
